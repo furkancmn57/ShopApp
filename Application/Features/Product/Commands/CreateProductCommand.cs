@@ -1,5 +1,6 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Features.Product.Commands.Validators;
 using Domain.Models;
 using MediatR;
 using System;
@@ -38,9 +39,12 @@ namespace Application.Features.Product.Commands
 
             public async Task<ProductAggregate> Handle(CreateProductCommand request, CancellationToken cancellationToken)
             {
-                if (string.IsNullOrEmpty(request.Name))
+                var validator = new CreateProductCommandValidator();
+                var validationResult = validator.Validate(request);
+
+                if (validationResult.IsValid == false)
                 {
-                    throw new BusinessException("Ürün ismi boş olamaz.");
+                    throw new ValidationException("Ürün eklerken hata oluştu.", validationResult.ToDictionary());
                 }
 
                 var product = ProductAggregate.Create(request.Name, request.Description, request.Price, request.Ingredients, request.Quantity);

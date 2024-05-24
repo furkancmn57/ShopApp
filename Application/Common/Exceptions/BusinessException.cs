@@ -8,10 +8,9 @@ namespace Application.Common.Exceptions
 {
     public class BusinessException : Exception
     {
-        public bool Success { get; }
         public BusinessException(string message) : base(message)
         {
-            Success = false;
+
         }
     }
 }

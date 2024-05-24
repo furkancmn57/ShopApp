@@ -1,6 +1,7 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.Common.Tools;
+using Application.Features.Order.Commands.Validators;
 using Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -67,6 +68,14 @@ namespace Application.Features.Order.Commands
                 await _context.SaveChangesAsync(cancellationToken);
                 double totalAmount = products.Sum(x => x.Price);
                 string orderNumber = await Tools.GenerateUniqueOrderNumber(cancellationToken);
+
+                var validator = new CreateOrderCommandValidator();
+                var validationResult = validator.Validate(request);
+
+                if (validationResult.IsValid == false)
+                {
+                    throw new ValidationException("Sipariş oluşturulurken hata oluştu.", validationResult.ToDictionary());
+                }
 
                 var order = OrderAggregate.Create(orderNumber, totalAmount, 0, request.CustomerName, products, address, user);
             }

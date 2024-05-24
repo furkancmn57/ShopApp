@@ -23,7 +23,7 @@ namespace WebApi.Middlewares
                 context.Response.StatusCode = 400;
                 context.Response.ContentType = "application/json";
 
-                var response = new { success = ex.Success, message = ex.Message };
+                var response = new { success = false, message = ex.Message };
                 var json = JsonSerializer.Serialize(response);
 
                 await context.Response.WriteAsync(json);
@@ -33,7 +33,27 @@ namespace WebApi.Middlewares
                 context.Response.StatusCode = 404;
                 context.Response.ContentType = "application/json";
 
-                var response = new { success = ex.Success, message = ex.Message };
+                var response = new { success = false, message = ex.Message };
+                var json = JsonSerializer.Serialize(response);
+
+                await context.Response.WriteAsync(json);
+            }
+            catch (ValidationException ex)
+            {
+                context.Response.StatusCode = 400;
+                context.Response.ContentType = "application/json";
+
+                var response = new { success = false, message = ex.Message, errors = ex.Errors };
+                var json = JsonSerializer.Serialize(response);
+
+                await context.Response.WriteAsync(json);
+            }
+            catch (Exception ex)
+            {
+                context.Response.StatusCode = 500;
+                context.Response.ContentType = "application/json";
+
+                var response = new { success = false, message = ex.Message };
                 var json = JsonSerializer.Serialize(response);
 
                 await context.Response.WriteAsync(json);

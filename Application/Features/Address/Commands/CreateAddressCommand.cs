@@ -1,5 +1,6 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Features.Address.Commands.Validatators;
 using Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +41,14 @@ namespace Application.Features.Address.Commands
                 if (user is null)
                 {
                     throw new NotFoundExcepiton("User Bulunamadı.");
+                }
+
+                var validator = new CreateAddressCommandValidator();
+                var validationResult = validator.Validate(request);
+
+                if (validationResult.IsValid == false)
+                {
+                    throw new ValidationException("Adres eklerken hata oluştu.", validationResult.ToDictionary());
                 }
 
                 var address = AddressAggregate.Create(request.AddressTitle, request.Address, user);

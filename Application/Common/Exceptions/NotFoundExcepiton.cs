@@ -8,10 +8,9 @@ namespace Application.Common.Exceptions
 {
     public class NotFoundExcepiton : Exception
     {
-        public bool Success { get; }
         public NotFoundExcepiton(string message) : base(message)
         {
-            Success = false;
+
         }
     }
 }
