@@ -43,7 +43,7 @@ namespace Application.Features.Product.Commands
 
                 if (product is null)
                 {
-                    throw new BusinessException("Ürün Bulunamadı.", 404);
+                    throw new NotFoundExcepiton("Ürün Bulunamadı.");
                 }
 
                 product.Update(request.Name, request.Description, request.Price, request.Ingredients, request.Quantity);

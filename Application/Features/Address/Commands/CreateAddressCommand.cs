@@ -39,7 +39,7 @@ namespace Application.Features.Address.Commands
 
                 if (user is null)
                 {
-                    throw new BusinessException("User Bulunamadı.", 404);
+                    throw new NotFoundExcepiton("User Bulunamadı.");
                 }
 
                 var address = AddressAggregate.Create(request.AddressTitle, request.Address, user);

@@ -34,7 +34,7 @@ namespace Application.Features.Product.Queries
 
                 if (product is null)
                 {
-                    throw new BusinessException("Ürün Bulunamadı",404);
+                    throw new NotFoundExcepiton("Ürün Bulunamadı");
                 }
 
                 return product;

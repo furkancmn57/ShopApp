@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <Folder Include="Models\Order\Response\" />
-    <Folder Include="Models\Order\Request\" />
   </ItemGroup>
 
 </Project>

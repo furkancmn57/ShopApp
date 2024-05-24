@@ -38,7 +38,7 @@ namespace Application.Features.Address.Commands
 
                 if (address is null)
                 {
-                    throw new BusinessException("Address Bulunamadı.", 404);
+                    throw new NotFoundExcepiton("Address Bulunamadı.");
                 }
 
                 address.Update(request.AddressTitle, request.Address);

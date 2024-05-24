@@ -24,7 +24,7 @@ namespace Domain.Models
             Address = address;
             User = user;
             OrderDate = DateTime.Now;
-            
+
         }
 
         public int Id { get; set; }
@@ -33,8 +33,8 @@ namespace Domain.Models
         public string OrderNumber { get; set; }
         public double TotalAmount { get; set; }
         public double DiscountAmount { get; set; }
-        public DateTime OrderDate { get; set; }
         public string CustomerName { get; set; }
+        public DateTime OrderDate { get; set; }
         public virtual List<ProductAggregate> Products { get; set; }
         public virtual AddressAggregate Address { get; set; }
         public virtual UserAggregate User { get; set; }

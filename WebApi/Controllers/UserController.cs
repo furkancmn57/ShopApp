@@ -30,6 +30,16 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById([FromRoute] int id, CancellationToken token)
+        {
+            var query = new GetUserByIdQuery(id);
+            var result = await _mediator.Send(query, token);
+
+            return Ok(result);
+        }
+
         [ProducesResponseType(StatusCodes.Status201Created)]
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request, CancellationToken token)

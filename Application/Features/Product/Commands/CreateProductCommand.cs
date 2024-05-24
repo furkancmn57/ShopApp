@@ -40,7 +40,7 @@ namespace Application.Features.Product.Commands
             {
                 if (string.IsNullOrEmpty(request.Name))
                 {
-                    throw new BusinessException("Ürün ismi boş olamaz.",400);
+                    throw new BusinessException("Ürün ismi boş olamaz.");
                 }
 
                 var product = ProductAggregate.Create(request.Name, request.Description, request.Price, request.Ingredients, request.Quantity);

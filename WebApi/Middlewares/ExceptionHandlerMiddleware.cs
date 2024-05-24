@@ -20,7 +20,17 @@ namespace WebApi.Middlewares
             }
             catch (BusinessException ex)
             {
-                context.Response.StatusCode = ex.StatusCode;
+                context.Response.StatusCode = 400;
+                context.Response.ContentType = "application/json";
+
+                var response = new { success = ex.Success, message = ex.Message };
+                var json = JsonSerializer.Serialize(response);
+
+                await context.Response.WriteAsync(json);
+            }
+            catch (NotFoundExcepiton ex)
+            {
+                context.Response.StatusCode = 404;
                 context.Response.ContentType = "application/json";
 
                 var response = new { success = ex.Success, message = ex.Message };

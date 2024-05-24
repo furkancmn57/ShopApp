@@ -26,6 +26,15 @@ namespace WebApi.Controllers
 
             return Ok(result);
         }
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAddressById([FromRoute] int id, CancellationToken token)
+        {
+            var query = new GetAddressByIdQuery(id);
+            var result = await _mediator.Send(query, token);
+
+            return Ok(result);
+        }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpPut("{id}")]

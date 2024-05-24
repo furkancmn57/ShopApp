@@ -40,7 +40,7 @@ namespace Application.Features.User.Commands
 
                 if (user is null)
                 {
-                    throw new BusinessException("User Bulunamadı.",404);
+                    throw new NotFoundExcepiton("User Bulunamadı.");
                 }
 
                 user.Update(request.FirstName, request.LastName, request.Email);

@@ -33,7 +33,7 @@ namespace Application.Features.Product.Commands
 
                 if (product is null)
                 {
-                    throw new BusinessException("Ürün Bulunamadı.", 404);
+                    throw new NotFoundExcepiton("Ürün Bulunamadı.");
                 }
 
                 _context.Products.Remove(product);

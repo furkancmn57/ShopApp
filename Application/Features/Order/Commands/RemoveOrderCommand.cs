@@ -7,18 +7,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Features.Address.Commands
+namespace Application.Features.Order.Commands
 {
-    public class RemoveAddressCommand : IRequest
+    public class RemoveOrderCommand : IRequest
     {
-        public RemoveAddressCommand(int id)
+        public RemoveOrderCommand(int id)
         {
             Id = id;
         }
 
-        public int Id { get; set; }
+        public int Id { get; }
 
-        public class Handler : IRequestHandler<RemoveAddressCommand>
+        public class Handler : IRequestHandler<RemoveOrderCommand>
         {
             private readonly IShopAppDbContext _context;
 
@@ -27,16 +27,16 @@ namespace Application.Features.Address.Commands
                 _context = context;
             }
 
-            public async Task Handle(RemoveAddressCommand request, CancellationToken cancellationToken)
+            public async Task Handle(RemoveOrderCommand request, CancellationToken cancellationToken)
             {
-                var address = await _context.Addresses.FindAsync(request.Id);
+                var order = await _context.Orders.FindAsync(request.Id);
 
-                if (address is null)
+                if (order is null)
                 {
-                    throw new NotFoundExcepiton("Address Bulunamadı.");
+                    throw new NotFoundExcepiton("Sipariş Bulunamadı.");
                 }
 
-                _context.Addresses.Remove(address);
+                _context.Orders.Remove(order);
                 await _context.SaveChangesAsync(cancellationToken);
             }
         }
