@@ -23,7 +23,7 @@ namespace Application.Features.User.Queries
 
             public async Task<List<UserAggregate>> Handle(GetUserQuery request, CancellationToken cancellationToken)
             {
-                var users = await _context.Users.Include(i => i.Addresses).ToListAsync(cancellationToken);
+                var users = await _context.Users.Include(i => i.Addresses).Include(i => i.Orders).ToListAsync(cancellationToken);
 
                 return users;
             }

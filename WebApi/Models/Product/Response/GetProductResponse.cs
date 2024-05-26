@@ -11,5 +11,6 @@ namespace WebApi.Models.Product.Response
         public double Price { get; set; }
         public List<Ingredients> Ingredients { get; set; }
         public double Quantity { get; set; }
+        public DateTime CreatedDate { get; set; }
     }
 }

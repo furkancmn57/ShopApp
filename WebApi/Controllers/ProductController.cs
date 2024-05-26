@@ -1,4 +1,5 @@
-﻿using Application.Features.Product.Commands;
+﻿using Application.Common.Interfaces;
+using Application.Features.Product.Commands;
 using Application.Features.Product.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Components.Forms;
@@ -15,18 +16,30 @@ namespace WebApi.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IRedisDbContext _redisClient;
 
-        public ProductController(IMediator mediator)
+        public ProductController(IMediator mediator, IRedisDbContext redisClient)
         {
             _mediator = mediator;
+            _redisClient = redisClient;
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
         public async Task<IActionResult> GetProducts(CancellationToken token)
         {
+            var cacheKey = "products";
+
+            var cacheValue = await _redisClient.Get<List<GetProductResponse>>(cacheKey);
+
+            if (cacheValue is not null)
+            {
+                return Ok(cacheValue);
+            }
+
             var query = new GetProductQuery();
             var result = await _mediator.Send(query, token);
+
 
             var response = result.Select(x => new GetProductResponse
             {
@@ -35,9 +48,11 @@ namespace WebApi.Controllers
                 Description = x.Description,
                 Price = x.Price,
                 Ingredients = x.Ingredients,
-                Quantity = x.Quantity
+                Quantity = x.Quantity,
+                CreatedDate = x.CreatedDate
             }).ToList();
 
+            await _redisClient.Add(cacheKey, response);
 
             return Ok(response);
         }
@@ -46,6 +61,15 @@ namespace WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById([FromRoute] int id, CancellationToken token)
         {
+            var cacheKey = $"product_{id}";
+
+            var cacheValue = await _redisClient.Get<GetProductResponse>(cacheKey);
+
+            if (cacheValue is not null)
+            {
+                return Ok(cacheValue);
+            }
+
             var query = new GetProductByIdQuery(id);
             var result = await _mediator.Send(query, token);
 
@@ -56,8 +80,11 @@ namespace WebApi.Controllers
                 Description = result.Description,
                 Price = result.Price,
                 Ingredients = result.Ingredients,
-                Quantity = result.Quantity
+                Quantity = result.Quantity,
+                CreatedDate = result.CreatedDate
             };
+
+            await _redisClient.Add(cacheKey, response);
 
             return Ok(response);
         }
@@ -85,8 +112,12 @@ namespace WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct([FromRoute] int id, RemoveProuctRequest request, CancellationToken token)
         {
+            var cacheKey = $"product_{id}";
+
             var query = request.ToCommand(id);
             await _mediator.Send(query, token);
+
+            await _redisClient.Delete(cacheKey);
 
             return Ok("Ürün Başarıyla Silindi.");
         }

@@ -1,6 +1,7 @@
 using Application.Common.Interfaces;
 using Application.Services;
 using Infrastructure.Contexts;
+using NetTopologySuite.Index.HPRtree;
 using WebApi.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,11 +9,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<IShopAppDbContext, ShopAppDbContext>();
 builder.Services.AddApplicationService(builder.Configuration);
-
+builder.Services.AddSingleton<IRedisDbContext, RedisDbContext>();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

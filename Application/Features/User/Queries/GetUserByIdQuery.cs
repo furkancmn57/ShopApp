@@ -2,6 +2,7 @@
 using Application.Common.Interfaces;
 using Domain.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,8 +31,11 @@ namespace Application.Features.User.Queries
 
             public async Task<UserAggregate> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
             {
-                var user = await _context.Users.FindAsync(request.Id, cancellationToken);
-
+                var user = await _context.Users
+                    .Include(u => u.Addresses)
+                    .Include(u => u.Orders)
+                    .FirstOrDefaultAsync(u => u.Id == request.Id, cancellationToken);
+                
                 if (user is null)
                 {
                     throw new NotFoundExcepiton("Kullanıcı Bulunamadı.");
