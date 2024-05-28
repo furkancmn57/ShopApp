@@ -7,9 +7,10 @@ namespace WebApi.Models.User.Request
         public string FirtName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
+        public string Password { get; set; }
         public CreateUserCommand ToCommand()
         {
-            return new CreateUserCommand(FirtName, LastName, Email);
+            return new CreateUserCommand(FirtName, LastName, Email, Password);
         }
     }
 }

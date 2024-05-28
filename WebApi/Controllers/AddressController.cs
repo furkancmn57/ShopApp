@@ -1,8 +1,10 @@
 ﻿using Application.Common.Interfaces;
 using Application.Features.Address.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Middlewares;
 using WebApi.Models.Address.Request;
 using WebApi.Models.Address.Response;
 
@@ -23,6 +25,7 @@ namespace WebApi.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAddresses(CancellationToken token)
         {
             var cacheKey = "addresses";

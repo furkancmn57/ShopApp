@@ -2,6 +2,7 @@
 using Application.Features.Product.Commands;
 using Application.Features.Product.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -26,6 +27,7 @@ namespace WebApi.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetProducts(CancellationToken token)
         {
             var cacheKey = "products";

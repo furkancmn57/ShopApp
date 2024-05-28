@@ -1,6 +1,5 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
-using Application.Common.Tools;
 using Application.Features.User.Commands.Validators;
 using Application.Services.AuthService;
 using Application.Services.PasswordService;
@@ -15,22 +14,18 @@ using System.Threading.Tasks;
 
 namespace Application.Features.User.Commands
 {
-    public class CreateUserCommand : IRequest<AccessToken>
+    public class LoginUserCommand : IRequest<AccessToken>
     {
-        public CreateUserCommand(string firstName, string lastName, string email, string password)
+        public LoginUserCommand(string email, string password)
         {
-            FirstName = firstName;
-            LastName = lastName;
             Email = email;
             Password = password;
         }
 
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
 
-        public class Handler : IRequestHandler<CreateUserCommand, AccessToken>
+        public class Handler : IRequestHandler<LoginUserCommand, AccessToken>
         {
             private readonly IShopAppDbContext _context;
             private readonly IAuthService _authService;
@@ -42,36 +37,35 @@ namespace Application.Features.User.Commands
                 _context = context;
                 _authService = authService;
                 _passwordService = passwordService;
-               _redisClient = redisClient;
+                _redisClient = redisClient;
             }
 
-            public async Task<AccessToken> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+            public async Task<AccessToken> Handle(LoginUserCommand request, CancellationToken cancellationToken)
             {
-                var validator = new CreateUserCommandValidator();
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email, cancellationToken);
+
+                var validator = new LoginUserCommandValidator();
                 var validationResult = validator.Validate(request);
 
                 if (validationResult.IsValid == false)
                 {
-                    throw new ValidationException("Kullanıcı eklerken hata oluştu.", validationResult.ToDictionary());
+                    throw new ValidationException("Giriş yaparken bir hata oluştu.", validationResult.ToDictionary());
                 }
 
-                var userExist = await _context.Users.AnyAsync(x => x.Email == request.Email,cancellationToken);
-
-                if (userExist)
+                if (user is null)
                 {
-                    throw new BusinessException("Bu email adresi ile kayıtlı kullanıcı mevcut.");
+                    throw new BusinessException("Email veya şifre hatalı.");
                 }
 
-                var hashPassword = _passwordService.HashPassword(request.Password);
-                
+                var passwordCheck = _passwordService.VerifyPassword(request.Password, user.Password);
 
-                var user = UserAggregate.Create(request.FirstName, request.LastName, request.Email, hashPassword);
+                if (!passwordCheck)
+                {
+                    throw new BusinessException("Email veya şifre hatalı.");
+                }
 
-                await _context.Users.AddAsync(user, cancellationToken);
-                await _context.SaveChangesAsync(cancellationToken);
 
                 var accessToken = await _authService.CreateAccessToken(user);
-
                 var name = $"session_user_id_{user.Id}";
                 var time = accessToken.Expiration - DateTime.Now;
                 await _redisClient.AddString(name, accessToken.Token.ToString(), time);
@@ -79,5 +73,5 @@ namespace Application.Features.User.Commands
                 return accessToken;
             }
         }
-    } 
+    }
 }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Common.Tools
 {
-    public static class Tools
+    public class Tools
     {
         private readonly static IShopAppDbContext _context;
         public static async Task<string> GenerateUniqueOrderNumber(CancellationToken token)
@@ -31,6 +31,12 @@ namespace Application.Common.Tools
             return orderNumber;
         }
 
-  
+        public string GenerateAuthUserName(int userId)
+        {
+            string authUserName = $"session_{userId}";
+
+            return authUserName;
+        }
+
     }
 }

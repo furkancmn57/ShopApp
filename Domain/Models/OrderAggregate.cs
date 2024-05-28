@@ -20,6 +20,7 @@ namespace Domain.Models
             TotalAmount = totalAmount;
             DiscountAmount = discountAmount;
             CustomerName = customerName;
+            Status = OrderStatus.Pending;
             Products = products;
             Address = address;
             User = user;
@@ -34,6 +35,15 @@ namespace Domain.Models
         public double TotalAmount { get; set; }
         public double DiscountAmount { get; set; }
         public string CustomerName { get; set; }
+        public OrderStatus Status { get; set; }
+        public enum OrderStatus
+        {
+            Pending,
+            Processing,
+            Shipped,
+            Delivered,
+            Canceled
+        }
         public DateTime OrderDate { get; set; }
         public virtual List<ProductAggregate> Products { get; set; }
         public virtual AddressAggregate Address { get; set; }

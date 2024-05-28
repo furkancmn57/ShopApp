@@ -48,5 +48,14 @@ namespace Infrastructure.Contexts
             await _database.KeyDeleteAsync(key);
         }
 
+        public async Task AddString(string key, string value, TimeSpan time)
+        {
+            await _database.StringSetAsync(key, value, time);
+        }
+
+        public async Task<bool> KeyExist(string key)
+        {
+            return await _database.KeyExistsAsync(key);
+        }
     }
 }

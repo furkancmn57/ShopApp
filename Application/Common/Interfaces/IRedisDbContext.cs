@@ -10,6 +10,8 @@ namespace Application.Common.Interfaces
     {
         Task<T> Get<T>(string key);
         Task Add<T>(string key, T value, int time = 1);
+        Task AddString(string key, string value, TimeSpan time);
+        Task<bool> KeyExist(string key);
         Task Delete(string key);
     }
 }

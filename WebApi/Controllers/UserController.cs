@@ -4,6 +4,7 @@ using Application.Features.User.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using WebApi.Models.Address.Request;
 using WebApi.Models.Address.Response;
 using WebApi.Models.User.Reponse;
@@ -47,11 +48,13 @@ namespace WebApi.Controllers
                 FirstName = x.FirstName,
                 LastName = x.LastName,
                 Email = x.Email,
+                CreatedDate = x.CreatedDate,
                 Addresses = x.Addresses.Select(a => new GetAddressResponse
                 {
                     Id = a.Id,
                     AddressTitle = a.AddressTitle,
-                    Address = a.Address
+                    Address = a.Address,
+                    CreatedDate = a.CreatedDate
                 }).ToList()
             }).ToList();
 
@@ -82,27 +85,19 @@ namespace WebApi.Controllers
                 FirstName = result.FirstName,
                 LastName = result.LastName,
                 Email = result.Email,
-                Addresses = result.Addresses.Select(x => new GetAddressResponse
+                CreatedDate = result.CreatedDate,
+                Addresses = result.Addresses.Select(a => new GetAddressResponse
                 {
-                    Id = x.Id,
-                    AddressTitle = x.AddressTitle,
-                    Address = x.Address,
+                    Id = a.Id,
+                    AddressTitle = a.AddressTitle,
+                    Address = a.Address,
+                    CreatedDate = a.CreatedDate
                 }).ToList()
             };
 
             await _redisClient.Add(cacheKey, response);
 
             return Ok(response);
-        }
-
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request, CancellationToken token)
-        {
-            var command = request.ToCommand();
-            var result = await _mediator.Send(command, token);
-
-            return Ok("Kullanıcı Başarıyla Oluşturuldu.");
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
