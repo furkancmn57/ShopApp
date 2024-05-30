@@ -41,6 +41,7 @@ namespace Infrastructure.Migrations
                     first_name = table.Column<string>(type: "varchar(30)", nullable: false),
                     last_name = table.Column<string>(type: "varchar(30)", nullable: false),
                     email = table.Column<string>(type: "varchar(50)", nullable: false),
+                    password = table.Column<string>(type: "varchar(250)", nullable: false),
                     created_date = table.Column<DateTime>(type: "date", nullable: false)
                 },
                 constraints: table =>
@@ -78,11 +79,12 @@ namespace Infrastructure.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     AddressId = table.Column<int>(type: "int", nullable: false),
-                    order_number = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    order_number = table.Column<Guid>(type: "uuid", nullable: false),
                     total_amount = table.Column<double>(type: "numeric(18,2)", nullable: false),
                     discount_amount = table.Column<double>(type: "numeric(18,2)", nullable: false),
-                    order_date = table.Column<DateTime>(type: "date", nullable: false),
-                    customer_name = table.Column<string>(type: "varchar(250)", nullable: false)
+                    customer_name = table.Column<string>(type: "varchar(250)", nullable: false),
+                    status = table.Column<string>(type: "varchar(50)", nullable: false),
+                    order_date = table.Column<DateTime>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {

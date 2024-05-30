@@ -12,47 +12,43 @@ namespace Domain.Models
         {
             // only db
         }
-        public OrderAggregate(string orderNumber, double totalAmount, double discountAmount, string customerName, List<ProductAggregate> products, AddressAggregate address, UserAggregate user)
+        private OrderAggregate(double totalAmount, double discountAmount, string customerName, List<ProductAggregate> products, AddressAggregate address, UserAggregate user)
         {
             UserId = user.Id;
             AddressId = address.Id;
-            OrderNumber = orderNumber;
             TotalAmount = totalAmount;
             DiscountAmount = discountAmount;
             CustomerName = customerName;
-            Status = OrderStatus.Pending;
+            Status = Enums.OrderStatus.Pending;
             Products = products;
             Address = address;
             User = user;
             OrderDate = DateTime.Now;
-
         }
 
         public int Id { get; set; }
         public int UserId { get; set; }
         public int AddressId { get; set; }
-        public string OrderNumber { get; set; }
+        public Guid OrderNumber { get; set; }
         public double TotalAmount { get; set; }
         public double DiscountAmount { get; set; }
         public string CustomerName { get; set; }
-        public OrderStatus Status { get; set; }
-        public enum OrderStatus
-        {
-            Pending,
-            Processing,
-            Shipped,
-            Delivered,
-            Canceled
-        }
+        public Enums.OrderStatus Status { get; set; }
         public DateTime OrderDate { get; set; }
         public virtual List<ProductAggregate> Products { get; set; }
         public virtual AddressAggregate Address { get; set; }
         public virtual UserAggregate User { get; set; }
 
 
-        public static OrderAggregate Create(string orderNumber, double totalAmount, double discountAmount, string customerName, List<ProductAggregate> products, AddressAggregate address, UserAggregate user)
+        public static OrderAggregate Create(double totalAmount, double discountAmount, string customerName, List<ProductAggregate> products, AddressAggregate address, UserAggregate user)
         {
-            return new OrderAggregate(orderNumber, totalAmount, discountAmount, customerName, products, address, user);
+            return new OrderAggregate(totalAmount, discountAmount, customerName, products, address, user);
+        }
+
+        public OrderAggregate Update(Enums.OrderStatus status)
+        {
+            Status = status;
+            return this;
         }
     }
 }

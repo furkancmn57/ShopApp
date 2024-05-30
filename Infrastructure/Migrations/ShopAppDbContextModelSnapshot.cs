@@ -82,11 +82,14 @@ namespace Infrastructure.Migrations
                         .HasColumnType("date")
                         .HasColumnName("order_date");
 
-                    b.Property<string>("OrderNumber")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
+                    b.Property<Guid>("OrderNumber")
+                        .HasColumnType("uuid")
                         .HasColumnName("order_number");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("status");
 
                     b.Property<double>("TotalAmount")
                         .HasColumnType("decimal(18,2)")

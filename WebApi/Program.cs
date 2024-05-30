@@ -3,6 +3,7 @@ using Application.Services;
 using Application.Services.AuthService;
 using Application.Services.PasswordService;
 using Infrastructure.Contexts;
+using Infrastructure.Persistence.Repositories.MailProviders;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using NetTopologySuite.Index.HPRtree;
@@ -17,6 +18,7 @@ builder.Services.AddScoped<IAuthService, AuthManager>();
 builder.Services.AddScoped<IPasswordService, PasswordManager>();
 builder.Services.AddApplicationService(builder.Configuration);
 builder.Services.AddSingleton<IRedisDbContext, RedisDbContext>();
+builder.Services.AddSingleton<IMailProviderFactory, MailProviderFactory>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

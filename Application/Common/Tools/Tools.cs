@@ -15,13 +15,6 @@ namespace Application.Common.Tools
         {
             string orderNumber = GenerateNumber();
 
-            var order = await _context.Orders.FirstOrDefaultAsync(x => x.OrderNumber == orderNumber, token);
-
-            if (order is not null)
-            {
-                return await GenerateUniqueOrderNumber(token);
-            }
-
             return orderNumber;
         }
         private static string GenerateNumber()

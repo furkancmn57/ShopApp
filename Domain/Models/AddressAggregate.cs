@@ -12,7 +12,7 @@ namespace Domain.Models
         {
             // only db
         }
-        public AddressAggregate(string addressTitle, string address, UserAggregate user)
+        private AddressAggregate(string addressTitle, string address, UserAggregate user)
         {
             UserId = user.Id;
             AddressTitle = addressTitle;

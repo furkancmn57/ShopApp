@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ShopAppDbContext))]
-    [Migration("20240523140725_init")]
+    [Migration("20240530141450_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -85,11 +85,14 @@ namespace Infrastructure.Migrations
                         .HasColumnType("date")
                         .HasColumnName("order_date");
 
-                    b.Property<string>("OrderNumber")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
+                    b.Property<Guid>("OrderNumber")
+                        .HasColumnType("uuid")
                         .HasColumnName("order_number");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("status");
 
                     b.Property<double>("TotalAmount")
                         .HasColumnType("decimal(18,2)")
@@ -176,6 +179,11 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(30)")
                         .HasColumnName("last_name");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("varchar(250)")
+                        .HasColumnName("password");
 
                     b.HasKey("Id");
 

@@ -25,13 +25,9 @@ namespace Application.Features.Order.Commands
 
         public int UserId { get; set; }
         public int AddressId { get; set; }
-        public List<int> ProductIds { get; set; }
         public string CustomerName { get; set; }
-        public virtual List<ProductAggregate> Products { get; set; }
-        public virtual AddressAggregate Address { get; set; }
-        public virtual UserAggregate User { get; set; }
-
-
+        public List<int> ProductIds { get; set; }
+        
         public class Handler : IRequestHandler<CreateOrderCommand>
         {
             private readonly IShopAppDbContext _context;
@@ -64,11 +60,6 @@ namespace Application.Features.Order.Commands
                     throw new NotFoundExcepiton("Ürünler Bulunamadı.");
                 }
 
-                products.ForEach(x => x.Quantity--);
-                await _context.SaveChangesAsync(cancellationToken);
-                double totalAmount = products.Sum(x => x.Price);
-                string orderNumber = await Tools.GenerateUniqueOrderNumber(cancellationToken);
-
                 var validator = new CreateOrderCommandValidator();
                 var validationResult = validator.Validate(request);
 
@@ -77,7 +68,13 @@ namespace Application.Features.Order.Commands
                     throw new ValidationException("Sipariş oluşturulurken hata oluştu.", validationResult.ToDictionary());
                 }
 
-                var order = OrderAggregate.Create(orderNumber, totalAmount, 0, request.CustomerName, products, address, user);
+                products.ForEach(x => x.Quantity--);
+                double totalAmount = products.Sum(x => x.Price);
+
+                var order = OrderAggregate.Create(totalAmount, 5, request.CustomerName, products, address, user);
+
+                await _context.Orders.AddAsync(order, cancellationToken);
+                await _context.SaveChangesAsync(cancellationToken);
             }
         }
     }

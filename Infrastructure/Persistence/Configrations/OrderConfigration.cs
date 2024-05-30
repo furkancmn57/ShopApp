@@ -17,12 +17,15 @@ namespace Infrastructure.Persistence.Configrations
             builder.HasKey(o => o.Id);
 
             builder.Property(x => x.Id).HasColumnName("id").HasColumnType("int");
-            builder.Property(o => o.OrderNumber).HasColumnName("order_number").HasMaxLength(200);
+            builder.Property(o => o.OrderNumber).HasColumnName("order_number").HasColumnType("uuid");
             builder.Property(o => o.TotalAmount).HasColumnName("total_amount").HasColumnType("decimal(18,2)");
             builder.Property(o => o.DiscountAmount).HasColumnName("discount_amount").HasColumnType("decimal(18,2)");
             builder.Property(o => o.OrderDate).HasColumnName("order_date").HasColumnType("date");
             builder.Property(o => o.CustomerName).HasColumnName("customer_name").HasColumnType("varchar(250)");
-            builder.Property(o => o.Status).HasColumnName("status").HasColumnType("int").HasConversion<int>();
+            builder.Property(o => o.Status).HasColumnName("status").HasColumnType("varchar(50)").HasConversion(
+                v => v.ToString(),
+                v => (Domain.Enums.OrderStatus)Enum.Parse(typeof(Domain.Enums.OrderStatus), v)
+            );
 
             builder.HasMany(o => o.Products).WithMany(p => p.Orders);
             builder.HasOne(o => o.Address).WithMany(a => a.Orders);

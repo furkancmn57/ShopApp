@@ -25,7 +25,6 @@ namespace WebApi.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetAddresses(CancellationToken token)
         {
             var cacheKey = "addresses";

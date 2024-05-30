@@ -15,8 +15,4 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Order\Response\" />
-  </ItemGroup>
-
 </Project>

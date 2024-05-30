@@ -12,7 +12,7 @@ namespace Domain.Models
         {
             // only db
         }
-        public UserAggregate(string firstName, string lastName, string email, string password)
+        private UserAggregate(string firstName, string lastName, string email, string password)
         {
             FirstName = firstName;
             LastName = lastName;
