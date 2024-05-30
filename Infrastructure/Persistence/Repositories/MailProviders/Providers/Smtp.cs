@@ -1,7 +1,6 @@
 ﻿using Application.Features.Mail.Interfaces;
 using Application.Features.Mail.Models;
 using Microsoft.Extensions.Configuration;
-using MimeKit;
 using System;
 using System.Collections.Generic;
 using System.Linq;

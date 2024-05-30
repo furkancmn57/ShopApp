@@ -1,6 +1,4 @@
-﻿using WebApi.Models.Address.Response;
-using WebApi.Models.Product.Response;
-using WebApi.Models.User.Reponse;
+﻿using WebApi.Models.Product.Response;
 
 namespace WebApi.Models.Order.Response
 {

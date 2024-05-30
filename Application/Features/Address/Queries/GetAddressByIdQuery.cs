@@ -1,7 +1,9 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Features.Address.Models;
 using Domain.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Application.Features.Address.Queries
 {
-    public class GetAddressByIdQuery : IRequest<AddressAggregate>
+    public class GetAddressByIdQuery : IRequest<GetAddressResponse>
     {
         public GetAddressByIdQuery(int id)
         {
@@ -19,7 +21,7 @@ namespace Application.Features.Address.Queries
 
         public int Id { get; }
 
-        public class Handler : IRequestHandler<GetAddressByIdQuery, AddressAggregate>
+        public class Handler : IRequestHandler<GetAddressByIdQuery, GetAddressResponse>
         {
             private readonly IShopAppDbContext _context;
 
@@ -28,9 +30,16 @@ namespace Application.Features.Address.Queries
                 _context = context;
             }
 
-            public async Task<AddressAggregate> Handle(GetAddressByIdQuery request, CancellationToken cancellationToken)
+            public async Task<GetAddressResponse> Handle(GetAddressByIdQuery request, CancellationToken cancellationToken)
             {
-                var address = await _context.Addresses.FindAsync(request.Id, cancellationToken);
+
+                var address = await _context.Addresses.Select(x => new GetAddressResponse
+                {
+                    Id = x.Id,
+                    AddressTitle = x.AddressTitle,
+                    Address = x.Address,
+                    CreatedDate = x.CreatedDate
+                }).FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
                 if (address is null)
                 {

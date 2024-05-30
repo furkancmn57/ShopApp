@@ -8,10 +8,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebApi.Models.Order.Response;
 
 namespace Application.Features.Order.Queries
 {
-    public class GetOrderByIdQuery : IRequest<OrderAggregate>
+    public class GetOrderByIdQuery : IRequest<GetOrderByIdResponse>
     {
         public GetOrderByIdQuery(int id)
         {
@@ -20,7 +21,7 @@ namespace Application.Features.Order.Queries
 
         public int Id { get; }
 
-        public class Handler : IRequestHandler<GetOrderByIdQuery, OrderAggregate>
+        public class Handler : IRequestHandler<GetOrderByIdQuery, GetOrderByIdResponse>
         {
             private readonly IShopAppDbContext _context;
 
@@ -29,13 +30,40 @@ namespace Application.Features.Order.Queries
                 _context = context;
             }
 
-            public async Task<OrderAggregate> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken)
+            public async Task<GetOrderByIdResponse> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken)
             {
                 var order = await _context.Orders
-                    .Include(i => i.Address)
                     .Include(i => i.Products)
+                    .Include(i => i.Address)
                     .Include(i => i.User)
-                    .FirstOrDefaultAsync(i => i.Id == request.Id, cancellationToken);
+                    .Where(x => x.Id == request.Id)
+                    .Select(order => new GetOrderByIdResponse
+                    {
+                        Id = order.Id,
+                        OrderNumber = order.OrderNumber,
+                        CustomerName = order.CustomerName,
+                        DiscountAmount = order.DiscountAmount,
+                        TotalAmount = order.TotalAmount,
+                        Status = order.Status.ToString(),
+                        Products = order.Products.Select(p => new GetProductResponseWithOrder
+                        {
+                            Id = p.Id,
+                            Name = p.Name,
+                            Description = p.Description,
+                            Price = p.Price
+                        }).ToList(),
+                        Address = new GetAddressResponseWithOrder
+                        {
+                            Address = order.Address.Address
+                        },
+                        User = new GetUserResponseWithOrder
+                        {
+                            FirstName = order.User.FirstName,
+                            LastName = order.User.LastName,
+                            Email = order.User.Email
+                        },
+                        OrderDate = order.OrderDate,
+                    }).FirstOrDefaultAsync(cancellationToken);
 
                 if (order is null)
                 {

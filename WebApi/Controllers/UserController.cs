@@ -1,13 +1,13 @@
 ﻿using Application.Common.Interfaces;
+using Application.Features.Address.Models;
 using Application.Features.Address.Queries;
+using Application.Features.User.Models;
 using Application.Features.User.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using WebApi.Models.Address.Request;
-using WebApi.Models.Address.Response;
-using WebApi.Models.User.Reponse;
 using WebApi.Models.User.Request;
 
 namespace WebApi.Controllers
@@ -27,9 +27,9 @@ namespace WebApi.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
-        public async Task<IActionResult> GetUsers(CancellationToken token)
+        public async Task<IActionResult> GetUsers(CancellationToken token, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var cacheKey = "users";
+            var cacheKey = $"users_{page}_{pageSize}";
 
             var cacheValue = await _redisClient.Get<List<GetUserResponse>>(cacheKey);
 
@@ -38,29 +38,17 @@ namespace WebApi.Controllers
                 return Ok(cacheValue);
             }
 
-            var query = new GetUserQuery();
+            var query = new GetUserQuery
+            {
+                Page = page,
+                PageSize = pageSize
+            };
 
             var result = await _mediator.Send(query, token);
 
-            var response = result.Select(x => new GetUserResponse
-            {
-                Id = x.Id,
-                FirstName = x.FirstName,
-                LastName = x.LastName,
-                Email = x.Email,
-                CreatedDate = x.CreatedDate,
-                Addresses = x.Addresses.Select(a => new GetAddressResponse
-                {
-                    Id = a.Id,
-                    AddressTitle = a.AddressTitle,
-                    Address = a.Address,
-                    CreatedDate = a.CreatedDate
-                }).ToList()
-            }).ToList();
+            await _redisClient.Add(cacheKey, result);
 
-            await _redisClient.Add(cacheKey, response);
-
-            return Ok(response);
+            return Ok(result);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]

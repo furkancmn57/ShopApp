@@ -1,5 +1,7 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Pagination;
 using Application.Features.Product.Commands;
+using Application.Features.Product.Models;
 using Application.Features.Product.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -27,35 +29,27 @@ namespace WebApi.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
-        public async Task<IActionResult> GetProducts(CancellationToken token)
+        public async Task<IActionResult> GetProducts(CancellationToken token, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var cacheKey = "products";
+            var cacheKey = $"products_{page}_{pageSize}";
 
-            var cacheValue = await _redisClient.Get<List<GetProductResponse>>(cacheKey);
+            var cacheValue = await _redisClient.Get<Pagination<GetProductResponse>>(cacheKey);
 
             if (cacheValue is not null)
             {
                 return Ok(cacheValue);
             }
 
-            var query = new GetProductQuery();
+            var query = new GetProductQuery
+            {
+                Page = page,
+                PageSize = pageSize
+            };
             var result = await _mediator.Send(query, token);
 
+            await _redisClient.Add(cacheKey, result);
 
-            var response = result.Select(x => new GetProductResponse
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Description = x.Description,
-                Price = x.Price,
-                Ingredients = x.Ingredients,
-                Quantity = x.Quantity,
-                CreatedDate = x.CreatedDate
-            }).ToList();
-
-            await _redisClient.Add(cacheKey, response);
-
-            return Ok(response);
+            return Ok(result);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]

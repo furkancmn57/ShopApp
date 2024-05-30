@@ -1,7 +1,11 @@
-﻿using Application.Features.User.Queries;
-using WebApi.Models.Address.Response;
+﻿using Application.Features.Address.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace WebApi.Models.User.Reponse
+namespace Application.Features.User.Models
 {
     public class GetUserResponse
     {
@@ -10,7 +14,6 @@ namespace WebApi.Models.User.Reponse
         public string LastName { get; set; }
         public string Email { get; set; }
         public DateTime CreatedDate { get; set; }
-
         public List<GetAddressResponse> Addresses { get; set; }
     }
 }

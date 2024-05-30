@@ -3,11 +3,9 @@ using Application.Features.Order.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Models.Address.Response;
 using WebApi.Models.Order.Request;
 using WebApi.Models.Order.Response;
 using WebApi.Models.Product.Response;
-using WebApi.Models.User.Reponse;
 
 namespace WebApi.Controllers
 {
@@ -40,44 +38,16 @@ namespace WebApi.Controllers
             var query = new GetOrderByIdQuery(id);
             var order = await _mediator.Send(query, token);
 
-            var response = new GetOrderByIdResponse
-            {
-                Id = order.Id,
-                OrderNumber = order.OrderNumber,
-                CustomerName = order.CustomerName,
-                DiscountAmount = order.DiscountAmount,
-                TotalAmount = order.TotalAmount,
-                Status = order.Status.ToString(),
-                Products = order.Products.Select(p => new GetProductResponseWithOrder
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Description = p.Description,
-                    Price = p.Price
-                }).ToList(),
-                Address = new GetAddressResponseWithOrder
-                {
-                    Address = order.Address.Address
-                },
-                User = new GetUserResponseWithOrder
-                {
-                    FirstName = order.User.FirstName,
-                    LastName = order.User.LastName,
-                    Email = order.User.Email
-                },
-                OrderDate = order.OrderDate,
-            };
+            await _redisClient.Add(cacheKey, order);
 
-            await _redisClient.Add(cacheKey, response);
-
-            return Ok(response);
+            return Ok(order);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
-        public async Task<IActionResult> GetOrders(CancellationToken token)
+        public async Task<IActionResult> GetOrders(CancellationToken token, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            string cacheKey = "orders";
+            string cacheKey = $"orders_{page}_{pageSize}";
 
             var cacheValue = await _redisClient.Get<GetOrderByIdResponse>(cacheKey);
 
@@ -88,28 +58,11 @@ namespace WebApi.Controllers
 
             var query = new GetOrderQuery();
             var orders = await _mediator.Send(query,token);
-            
-            var response = orders.Select(x => new GetOrdersResponse
-            {
-                Id = x.Id,
-                OrderNumber = x.OrderNumber,
-                CustomerName = x.CustomerName,
-                DiscountAmount = x.DiscountAmount,
-                TotalAmount = x.TotalAmount,
-                Status = x.Status.ToString(),
-                //User = new GetUserResponseWithOrder
-                //{
-                //    FirstName = x.User.FirstName,
-                //    LastName = x.User.LastName,
-                //    Email = x.User.Email
-                //},
-                OrderDate = x.OrderDate
-            }).ToList();
-
+           
 
             await _redisClient.Add(cacheKey, orders);
 
-            return Ok(response);
+            return Ok(orders);
         }
 
         [ProducesResponseType(StatusCodes.Status201Created)]

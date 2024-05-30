@@ -1,7 +1,11 @@
-﻿using Application.Features.Product.Queries;
-using Domain.Models;
+﻿using Domain.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace WebApi.Models.Product.Response
+namespace Application.Features.Product.Models
 {
     public class GetProductResponse
     {

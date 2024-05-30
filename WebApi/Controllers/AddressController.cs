@@ -1,12 +1,14 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Pagination;
+using Application.Features.Address.Models;
 using Application.Features.Address.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using WebApi.Middlewares;
 using WebApi.Models.Address.Request;
-using WebApi.Models.Address.Response;
 
 namespace WebApi.Controllers
 {
@@ -25,32 +27,30 @@ namespace WebApi.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
-        public async Task<IActionResult> GetAddresses(CancellationToken token)
+        public async Task<IActionResult> GetAddresses(CancellationToken token, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var cacheKey = "addresses";
+            var cacheKey = $"addresses_{page}_{pageSize}";
 
-            var cacheValue = await _redisClient.Get<List<GetAddressResponse>>(cacheKey);
+            var cacheValue = await _redisClient.Get<Pagination<GetAddressResponse>>(cacheKey);
 
             if (cacheValue is not null)
             {
                 return Ok(cacheValue);
             }
 
-            var query = new GetAddressQuery();
+            var query = new GetAddressQuery
+            {
+                Page = page,
+                PageSize = pageSize
+            };
+
             var result = await _mediator.Send(query, token);
 
-            var response = result.Select(x => new GetAddressResponse
-            {
-                Id = x.Id,
-                AddressTitle = x.AddressTitle,
-                Address = x.Address,
-                CreatedDate = x.CreatedDate
-            }).ToList();
+            await _redisClient.Add(cacheKey, result);
 
-            await _redisClient.Add(cacheKey, response);
-
-            return Ok(response);
+            return Ok(result);
         }
+
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAddressById([FromRoute] int id, CancellationToken token)

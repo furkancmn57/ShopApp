@@ -10,26 +10,11 @@ namespace Application.Common.Tools
 {
     public class Tools
     {
-        private readonly static IShopAppDbContext _context;
-        public static async Task<string> GenerateUniqueOrderNumber(CancellationToken token)
-        {
-            string orderNumber = GenerateNumber();
-
-            return orderNumber;
-        }
-        private static string GenerateNumber()
-        {
-            string orderNumber = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 10).ToUpper();
-
-            return orderNumber;
-        }
-
         public string GenerateAuthUserName(int userId)
         {
             string authUserName = $"session_{userId}";
 
             return authUserName;
         }
-
     }
 }

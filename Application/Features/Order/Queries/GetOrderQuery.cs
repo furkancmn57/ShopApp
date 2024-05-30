@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Pagination;
 using Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -7,12 +8,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebApi.Models.Order.Response;
 
 namespace Application.Features.Order.Queries
 {
-    public class GetOrderQuery : IRequest<List<OrderAggregate>>
+    public class GetOrderQuery : IRequest<Pagination<GetOrdersResponse>>
     {
-        public class Handler : IRequestHandler<GetOrderQuery, List<OrderAggregate>>
+        public int Page { get; set; }
+        public int PageSize { get; set; }
+        public class Handler : IRequestHandler<GetOrderQuery, Pagination<GetOrdersResponse>>
         {
             private readonly IShopAppDbContext _context;
 
@@ -21,11 +25,34 @@ namespace Application.Features.Order.Queries
                 _context = context;
             }
 
-            public async Task<List<OrderAggregate>> Handle(GetOrderQuery request, CancellationToken cancellationToken)
+            public async Task<Pagination<GetOrdersResponse>> Handle(GetOrderQuery request, CancellationToken cancellationToken)
             {
-                var orders = await _context.Orders.ToListAsync(cancellationToken);
+                var totalorders = await _context.Orders.CountAsync(cancellationToken);
 
-                return orders;
+                var orders = await _context.Orders
+                    .Select(x => new GetOrdersResponse
+                    {
+                        Id = x.Id,
+                        OrderNumber = x.OrderNumber,
+                        CustomerName = x.CustomerName,
+                        DiscountAmount = x.DiscountAmount,
+                        TotalAmount = x.TotalAmount,
+                        Status = x.Status.ToString(),
+                        OrderDate = x.OrderDate,
+
+                    })
+                    .Skip((request.Page - 1) * request.PageSize)
+                    .Take(request.PageSize)
+                    .ToListAsync(cancellationToken);
+
+                return new Pagination<GetOrdersResponse>
+                {
+                    Page = request.Page,
+                    PageSize = request.PageSize,
+                    TotalCount = totalorders,
+                    TotalPages = (int)Math.Ceiling(totalorders / (decimal)request.PageSize),
+                    Data = orders
+                };
             }
         }
     }

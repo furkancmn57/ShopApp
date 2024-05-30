@@ -1,4 +1,6 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Pagination;
+using Application.Features.Address.Models;
 using Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -10,9 +12,11 @@ using System.Threading.Tasks;
 
 namespace Application.Features.Address.Queries
 {
-    public class GetAddressQuery : IRequest<List<AddressAggregate>>
+    public class GetAddressQuery : IRequest<Pagination<GetAddressResponse>>
     {
-        public class Handler : IRequestHandler<GetAddressQuery, List<AddressAggregate>>
+        public int Page { get; set; }
+        public int PageSize { get; set; }
+        public class Handler : IRequestHandler<GetAddressQuery, Pagination<GetAddressResponse>>
         {
             private readonly IShopAppDbContext _context;
 
@@ -21,11 +25,30 @@ namespace Application.Features.Address.Queries
                 _context = context;
             }
 
-            public async Task<List<AddressAggregate>> Handle(GetAddressQuery request, CancellationToken cancellationToken)
+            public async Task<Pagination<GetAddressResponse>> Handle(GetAddressQuery request, CancellationToken cancellationToken)
             {
-                var addresses = await _context.Addresses.ToListAsync(cancellationToken);
+                var totaladdresses = await _context.Addresses.CountAsync(cancellationToken);
 
-                return addresses;
+                var addresses = await _context.Addresses
+                    .Select(x => new GetAddressResponse
+                    {
+                        Id = x.Id,
+                        AddressTitle = x.AddressTitle,
+                        Address = x.Address,
+                        CreatedDate = x.CreatedDate
+                    })
+                    .Skip((request.Page - 1) * request.PageSize)
+                    .Take(request.PageSize)
+                    .ToListAsync(cancellationToken);
+
+                return new Pagination<GetAddressResponse>
+                {
+                    Page = request.Page,
+                    PageSize = request.PageSize,
+                    TotalCount = totaladdresses,
+                    TotalPages = (int)Math.Ceiling(totaladdresses / (decimal)request.PageSize),
+                    Data = addresses
+                };
             }
         }
     }

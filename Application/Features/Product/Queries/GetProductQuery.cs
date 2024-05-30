@@ -1,4 +1,6 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Pagination;
+using Application.Features.Product.Models;
 using Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -10,9 +12,11 @@ using System.Threading.Tasks;
 
 namespace Application.Features.Product.Queries
 {
-    public class GetProductQuery : IRequest<List<ProductAggregate>>
+    public class GetProductQuery : IRequest<Pagination<GetProductResponse>>
     {
-        public class Handler : IRequestHandler<GetProductQuery, List<ProductAggregate>>
+        public int Page { get; set; }
+        public int PageSize { get; set; }
+        public class Handler : IRequestHandler<GetProductQuery, Pagination<GetProductResponse>>
         {
             private readonly IShopAppDbContext _context;
 
@@ -21,12 +25,33 @@ namespace Application.Features.Product.Queries
                 _context = context;
             }
 
-            public async Task<List<ProductAggregate>> Handle(GetProductQuery request, CancellationToken cancellationToken)
+            public async Task<Pagination<GetProductResponse>> Handle(GetProductQuery request, CancellationToken cancellationToken)
             {
-                var products = await _context.Products.ToListAsync(cancellationToken);
+                var totalproducts = await _context.Products.CountAsync(cancellationToken);
+
+                var products = await _context.Products
+                    .Select(x => new GetProductResponse
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Description = x.Description,
+                        Price = x.Price,
+                        Ingredients = x.Ingredients,
+                        CreatedDate = x.CreatedDate
+                    })
+                    .Skip((request.Page - 1) * request.PageSize)
+                    .Take(request.PageSize)
+                    .ToListAsync(cancellationToken);
 
 
-                return products;
+                return new Pagination<GetProductResponse>
+                {
+                    Page = request.Page,
+                    PageSize = request.PageSize,
+                    TotalCount = totalproducts,
+                    TotalPages = (int)Math.Ceiling(totalproducts / (decimal)request.PageSize),
+                    Data = products
+                };
             }
         }
     }
