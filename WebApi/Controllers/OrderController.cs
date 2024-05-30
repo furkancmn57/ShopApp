@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Models.Order.Request;
 using WebApi.Models.Order.Response;
-using WebApi.Models.Product.Response;
 
 namespace WebApi.Controllers
 {

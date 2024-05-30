@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Models.Product.Request;
-using WebApi.Models.Product.Response;
 
 namespace WebApi.Controllers
 {
