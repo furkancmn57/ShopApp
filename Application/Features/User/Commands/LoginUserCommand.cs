@@ -1,6 +1,7 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
-using Application.Features.User.Commands.Validators;
+using Application.Features.User.Constants;
+using Application.Features.User.Validators;
 using Application.Services.AuthService;
 using Application.Services.PasswordService;
 using Domain.Models;
@@ -49,19 +50,19 @@ namespace Application.Features.User.Commands
 
                 if (validationResult.IsValid == false)
                 {
-                    throw new ValidationException("Giriş yaparken bir hata oluştu.", validationResult.ToDictionary());
+                    throw new ValidationException(UserConstants.UserLoginError, validationResult.ToDictionary());
                 }
 
                 if (user is null)
                 {
-                    throw new BusinessException("Email veya şifre hatalı.");
+                    throw new BusinessException(UserConstants.UserEmailOrPasswordError);
                 }
 
                 var passwordCheck = _passwordService.VerifyPassword(request.Password, user.Password);
 
                 if (!passwordCheck)
                 {
-                    throw new BusinessException("Email veya şifre hatalı.");
+                    throw new BusinessException(UserConstants.UserEmailOrPasswordError);
                 }
 
 

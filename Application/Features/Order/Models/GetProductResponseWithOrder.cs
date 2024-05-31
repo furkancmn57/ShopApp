@@ -1,4 +1,4 @@
-﻿namespace WebApi.Models.Order.Response
+﻿namespace Application.Features.Order.Models
 {
     public class GetProductResponseWithOrder
     {

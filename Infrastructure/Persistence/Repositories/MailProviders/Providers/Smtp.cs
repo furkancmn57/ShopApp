@@ -22,7 +22,7 @@ namespace Infrastructure.Persistence.Repositories.MailProviders.Providers
             _configuration = configuration;
         }
 
-        public async Task Send(Settings settings, string messageString, string titleString, string address)
+        public async Task Send(string messageString, string titleString, string address)
         {
             MailMessage message = new MailMessage();
 

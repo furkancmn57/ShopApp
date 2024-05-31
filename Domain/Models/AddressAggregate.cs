@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Models
 {
-    public class AddressAggregate
+    public class AddressAggregate : BaseModel
     {
         public AddressAggregate() 
         {
@@ -21,11 +21,9 @@ namespace Domain.Models
             CreatedDate = DateTime.Now;
         }
 
-        public int Id { get; set; }
         public int UserId { get; set; }
         public string AddressTitle { get; set; }
         public string Address { get; set; }
-        public DateTime CreatedDate { get; set; }
         public virtual UserAggregate User { get; set; }
         public virtual List<OrderAggregate> Orders { get; set; }
 

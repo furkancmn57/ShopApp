@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Pagination;
 using Application.Features.Product.Commands;
+using Application.Features.Product.Constans;
 using Application.Features.Product.Models;
 using Application.Features.Product.Queries;
 using MediatR;
@@ -89,7 +90,7 @@ namespace WebApi.Controllers
         {
             var result = await _mediator.Send(request.ToCommand());
 
-            return Ok("Ürün Başarıyla Oluşturuldu.");
+            return Ok(ProductConstants.ProductCreateSuccess);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -99,7 +100,7 @@ namespace WebApi.Controllers
             var query = request.ToCommand(id);
             await _mediator.Send(query, token);
 
-            return Ok("Ürün Başarıyla Güncellendi.");
+            return Ok(ProductConstants.ProductUpdateSuccess);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -113,7 +114,7 @@ namespace WebApi.Controllers
 
             await _redisClient.Delete(cacheKey);
 
-            return Ok("Ürün Başarıyla Silindi.");
+            return Ok(ProductConstants.ProductDeleteSuccess);
         }
     }
 }

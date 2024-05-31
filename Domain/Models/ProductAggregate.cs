@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Models
 {
-    public class ProductAggregate
+    public class ProductAggregate : BaseModel
     {
         public ProductAggregate()
         {
@@ -21,12 +21,9 @@ namespace Domain.Models
             Ingredients = ingredients;
             Quantity = quantity;
         }
-
-        public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public double Price { get; set; }
-        public DateTime CreatedDate { get; set; }
         public List<Ingredients> Ingredients { get; set; }
         public double Quantity { get; set; }
         public virtual List<OrderAggregate> Orders { get; set; }

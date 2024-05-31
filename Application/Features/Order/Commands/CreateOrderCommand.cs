@@ -1,7 +1,10 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.Common.Tools;
-using Application.Features.Order.Commands.Validators;
+using Application.Features.Address.Constans;
+using Application.Features.Order.Commands;
+using Application.Features.Order.Constants;
+using Application.Features.Order.Validators;
 using Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -65,7 +68,7 @@ namespace Application.Features.Order.Commands
 
                 if (validationResult.IsValid == false)
                 {
-                    throw new ValidationException("Sipariş oluşturulurken hata oluştu.", validationResult.ToDictionary());
+                    throw new ValidationException(OrderConstants.OrderAddError, validationResult.ToDictionary());
                 }
 
                 products.ForEach(x => x.Quantity--);

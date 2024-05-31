@@ -1,5 +1,6 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Features.User.Constants;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace Application.Features.User.Commands
 
                 if (user is null)
                 {
-                    throw new NotFoundExcepiton("User Bulunamadı.");
+                    throw new NotFoundExcepiton(UserConstants.UserNotFound);
                 }
 
                 _context.Users.Remove(user);

@@ -19,7 +19,10 @@ namespace Infrastructure.Persistence.Configrations
             builder.Property(x => x.Id).HasColumnName("id").HasColumnType("int");
             builder.Property(x => x.AddressTitle).HasColumnName("address_title").HasColumnType("varchar(50)");
             builder.Property(x => x.Address).HasColumnName("address").HasColumnType("varchar(250)");
+            builder.Property(x => x.IsDeleted).HasColumnName("is_deleted").HasColumnName("boolean");
             builder.Property(x => x.CreatedDate).HasColumnName("created_date").HasColumnType("date");
+            builder.Property(x => x.UpdatedDate).HasColumnName("updated_date").HasColumnType("date");
+            builder.Property(x => x.DeletedDate).HasColumnName("deleted_date").HasColumnType("date");
 
             builder.HasOne(x => x.User).WithMany(x => x.Addresses);
             builder.HasMany(x => x.Orders).WithOne(x => x.Address);

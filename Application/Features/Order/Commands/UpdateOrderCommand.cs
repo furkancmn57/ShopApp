@@ -2,6 +2,7 @@
 using Application.Common.Interfaces;
 using Application.Features.Mail.Enums;
 using Application.Features.Mail.Models;
+using Application.Features.Order.Constants;
 using Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -41,7 +42,7 @@ namespace Application.Features.Order.Commands
 
                 if (order is null)
                 {
-                    throw new NotFoundExcepiton("Sipariş Bulunamadı.");
+                    throw new NotFoundExcepiton(OrderConstants.OrderNotFound);
                 }
 
                 // enumlar eklenikcek ilersi için şuan boş sipariş takibi için
@@ -51,11 +52,8 @@ namespace Application.Features.Order.Commands
                 _context.Orders.Update(order);
                 await _context.SaveChangesAsync(cancellationToken);
 
-                var settings = new Settings { Provider = MailServiceProvider.Smtp };
-
-                var mailProvider = _mailProviderFactory.GetProvider(settings);
-
-                await mailProvider.Send(settings, $"Siparişinizin durumu güncellendi. Yeni durum: {request.Status.ToString()}", "Sipariş Durumu Güncellendi", order.User.Email.ToString());
+                var mailProvider = _mailProviderFactory.GetProvider(new Settings());
+                await mailProvider.Send($"Siparişinizin durumu güncellendi. Yeni durum: {request.Status.ToString()}", "Sipariş Durumu Güncellendi", order.User.Email.ToString());
             }
         }
     }

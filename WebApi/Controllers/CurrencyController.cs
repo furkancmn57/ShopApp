@@ -8,8 +8,7 @@ namespace WebApi.Controllers
     [ApiController]
     public class CurrencyController : ControllerBase
     {
-        
-
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
         public async Task<IActionResult> GetCurrencies()
         {

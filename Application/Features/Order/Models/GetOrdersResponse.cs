@@ -1,4 +1,4 @@
-﻿namespace WebApi.Models.Order.Response
+﻿namespace Application.Features.Order.Models
 {
     public class GetOrdersResponse
     {
@@ -9,6 +9,6 @@
         public string CustomerName { get; set; }
         public string Status { get; set; }
         //public GetUserResponseWithOrder User { get; set; }
-        public DateTime OrderDate { get; set; }
+        public DateTime CreatedDate { get; set; }
     }
 }

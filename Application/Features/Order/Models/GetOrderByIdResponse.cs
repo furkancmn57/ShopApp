@@ -1,6 +1,4 @@
-﻿
-
-namespace WebApi.Models.Order.Response
+﻿namespace Application.Features.Order.Models
 {
     public class GetOrderByIdResponse
     {
@@ -10,9 +8,9 @@ namespace WebApi.Models.Order.Response
         public double DiscountAmount { get; set; }
         public string CustomerName { get; set; }
         public string Status { get; set; }
-        public  List<GetProductResponseWithOrder> Products { get; set; }
+        public List<GetProductResponseWithOrder> Products { get; set; }
         public GetAddressResponseWithOrder Address { get; set; }
         public GetUserResponseWithOrder User { get; set; }
-        public DateTime OrderDate { get; set; }
+        public DateTime CreatedDate { get; set; }
     }
 }

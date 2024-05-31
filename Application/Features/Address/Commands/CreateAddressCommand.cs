@@ -1,6 +1,8 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
-using Application.Features.Address.Commands.Validatators;
+using Application.Features.Address.Commands;
+using Application.Features.Address.Constans;
+using Application.Features.Address.Validatators;
 using Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -48,7 +50,7 @@ namespace Application.Features.Address.Commands
 
                 if (validationResult.IsValid == false)
                 {
-                    throw new ValidationException("Adres eklerken hata oluştu.", validationResult.ToDictionary());
+                    throw new ValidationException(AddressConstants.AddressAddError, validationResult.ToDictionary());
                 }
 
                 var address = AddressAggregate.Create(request.AddressTitle, request.Address, user);

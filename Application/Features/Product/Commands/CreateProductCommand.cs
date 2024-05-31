@@ -1,6 +1,7 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
-using Application.Features.Product.Commands.Validators;
+using Application.Features.Product.Constans;
+using Application.Features.Product.Validators;
 using Domain.Models;
 using MediatR;
 using System;
@@ -44,7 +45,7 @@ namespace Application.Features.Product.Commands
 
                 if (validationResult.IsValid == false)
                 {
-                    throw new ValidationException("Ürün eklerken hata oluştu.", validationResult.ToDictionary());
+                    throw new ValidationException(ProductConstants.ProductCreateError, validationResult.ToDictionary());
                 }
 
                 var product = ProductAggregate.Create(request.Name, request.Description, request.Price, request.Ingredients, request.Quantity);

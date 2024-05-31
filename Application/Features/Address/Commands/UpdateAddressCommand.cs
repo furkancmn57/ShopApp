@@ -1,5 +1,6 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Features.Address.Constans;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -38,7 +39,7 @@ namespace Application.Features.Address.Commands
 
                 if (address is null)
                 {
-                    throw new NotFoundExcepiton("Address Bulunamadı.");
+                    throw new NotFoundExcepiton(AddressConstants.AddressNotFound);
                 }
 
                 address.Update(request.AddressTitle, request.Address);

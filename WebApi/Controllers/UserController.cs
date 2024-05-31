@@ -1,6 +1,8 @@
 ﻿using Application.Common.Interfaces;
+using Application.Features.Address.Constans;
 using Application.Features.Address.Models;
 using Application.Features.Address.Queries;
+using Application.Features.User.Constants;
 using Application.Features.User.Models;
 using Application.Features.User.Queries;
 using MediatR;
@@ -95,7 +97,7 @@ namespace WebApi.Controllers
             var command = request.ToCommand(id);
             await _mediator.Send(command, token);
 
-            return Ok("Kullanıcı Başarıyla Güncellendi.");
+            return Ok(UserConstants.UserUpdateSuccess);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -109,7 +111,7 @@ namespace WebApi.Controllers
 
             await _redisClient.Delete(cacheKey);
 
-            return Ok("Kullanıcı Başarıyla Silindi.");
+            return Ok(UserConstants.UserDeleteSuccess);
         }
 
         // Address route
@@ -121,7 +123,7 @@ namespace WebApi.Controllers
             var command = request.ToCommand(id);
             await _mediator.Send(command, token);
 
-            return Ok("Adres Başarıyla Oluşturuldu.");
+            return Ok(AddressConstants.AddressAddSuccess);
         }
     }
 }

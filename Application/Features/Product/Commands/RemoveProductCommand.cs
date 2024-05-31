@@ -1,5 +1,6 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Features.Product.Constans;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace Application.Features.Product.Commands
 
                 if (product is null)
                 {
-                    throw new NotFoundExcepiton("Ürün Bulunamadı.");
+                    throw new NotFoundExcepiton(ProductConstants.ProductNotFound);
                 }
 
                 _context.Products.Remove(product);

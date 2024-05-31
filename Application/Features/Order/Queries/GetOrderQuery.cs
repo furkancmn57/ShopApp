@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Pagination;
+using Application.Features.Order.Models;
 using Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WebApi.Models.Order.Response;
 
 namespace Application.Features.Order.Queries
 {
@@ -38,7 +38,7 @@ namespace Application.Features.Order.Queries
                         DiscountAmount = x.DiscountAmount,
                         TotalAmount = x.TotalAmount,
                         Status = x.Status.ToString(),
-                        OrderDate = x.OrderDate,
+                        CreatedDate = x.CreatedDate,
 
                     })
                     .Skip((request.Page - 1) * request.PageSize)

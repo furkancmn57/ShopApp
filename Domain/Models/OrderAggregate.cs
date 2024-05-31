@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Models
 {
-    public class OrderAggregate
+    public class OrderAggregate : BaseModel
     {
         public OrderAggregate()
         {
@@ -16,6 +16,7 @@ namespace Domain.Models
         {
             UserId = user.Id;
             AddressId = address.Id;
+            OrderNumber = Guid.NewGuid();
             TotalAmount = totalAmount;
             DiscountAmount = discountAmount;
             CustomerName = customerName;
@@ -23,10 +24,8 @@ namespace Domain.Models
             Products = products;
             Address = address;
             User = user;
-            OrderDate = DateTime.Now;
         }
 
-        public int Id { get; set; }
         public int UserId { get; set; }
         public int AddressId { get; set; }
         public Guid OrderNumber { get; set; }
@@ -34,7 +33,6 @@ namespace Domain.Models
         public double DiscountAmount { get; set; }
         public string CustomerName { get; set; }
         public Enums.OrderStatus Status { get; set; }
-        public DateTime OrderDate { get; set; }
         public virtual List<ProductAggregate> Products { get; set; }
         public virtual AddressAggregate Address { get; set; }
         public virtual UserAggregate User { get; set; }

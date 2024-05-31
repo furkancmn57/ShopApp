@@ -1,5 +1,6 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Features.Product.Constans;
 using Domain.Models;
 using MediatR;
 using System;
@@ -43,7 +44,7 @@ namespace Application.Features.Product.Commands
 
                 if (product is null)
                 {
-                    throw new NotFoundExcepiton("Ürün Bulunamadı.");
+                    throw new NotFoundExcepiton(ProductConstants.ProductNotFound);
                 }
 
                 product.Update(request.Name, request.Description, request.Price, request.Ingredients, request.Quantity);

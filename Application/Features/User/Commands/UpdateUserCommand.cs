@@ -1,7 +1,9 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Features.User.Constants;
 using Domain.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,11 +38,11 @@ namespace Application.Features.User.Commands
 
             public async Task Handle(UpdateUserCommand request, CancellationToken cancellationToken)
             {
-                var user = await _context.Users.FindAsync(request.Id);
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
                 if (user is null)
                 {
-                    throw new NotFoundExcepiton("User Bulunamadı.");
+                    throw new NotFoundExcepiton(UserConstants.UserNotFound);
                 }
 
                 user.Update(request.FirstName, request.LastName, request.Email);

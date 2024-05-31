@@ -1,10 +1,10 @@
 ﻿using Application.Common.Interfaces;
+using Application.Features.Order.Models;
 using Application.Features.Order.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Models.Order.Request;
-using WebApi.Models.Order.Response;
 
 namespace WebApi.Controllers
 {

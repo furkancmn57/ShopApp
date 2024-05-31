@@ -9,6 +9,6 @@ namespace Application.Features.Mail.Interfaces
 {
     public interface IMailServiceProvider
     {
-        Task Send(Settings settings, string messageString, string titleString, string address);
+        Task Send(string messageString, string titleString, string address);
     }
 }

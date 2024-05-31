@@ -1,7 +1,8 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.Common.Tools;
-using Application.Features.User.Commands.Validators;
+using Application.Features.User.Constants;
+using Application.Features.User.Validators;
 using Application.Services.AuthService;
 using Application.Services.PasswordService;
 using Domain.Models;
@@ -52,14 +53,14 @@ namespace Application.Features.User.Commands
 
                 if (validationResult.IsValid == false)
                 {
-                    throw new ValidationException("Kullanıcı eklerken hata oluştu.", validationResult.ToDictionary());
+                    throw new ValidationException(UserConstants.UserCreateError, validationResult.ToDictionary());
                 }
 
                 var userExist = await _context.Users.AnyAsync(x => x.Email == request.Email,cancellationToken);
 
                 if (userExist)
                 {
-                    throw new BusinessException("Bu email adresi ile kayıtlı kullanıcı mevcut.");
+                    throw new BusinessException(UserConstants.UserExist);
                 }
 
                 var hashPassword = _passwordService.HashPassword(request.Password);

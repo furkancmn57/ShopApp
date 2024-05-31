@@ -1,5 +1,6 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Features.Order.Models;
 using Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WebApi.Models.Order.Response;
 
 namespace Application.Features.Order.Queries
 {
@@ -62,7 +62,7 @@ namespace Application.Features.Order.Queries
                             LastName = order.User.LastName,
                             Email = order.User.Email
                         },
-                        OrderDate = order.OrderDate,
+                        CreatedDate = order.CreatedDate,
                     }).FirstOrDefaultAsync(cancellationToken);
 
                 if (order is null)

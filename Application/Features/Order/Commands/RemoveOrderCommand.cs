@@ -1,5 +1,6 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Features.Order.Constants;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace Application.Features.Order.Commands
 
                 if (order is null)
                 {
-                    throw new NotFoundExcepiton("Sipariş Bulunamadı.");
+                    throw new NotFoundExcepiton(OrderConstants.OrderNotFound);
                 }
 
                 _context.Orders.Remove(order);

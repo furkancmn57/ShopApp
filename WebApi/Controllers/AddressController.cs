@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Pagination;
+using Application.Features.Address.Constans;
 using Application.Features.Address.Models;
 using Application.Features.Address.Queries;
 using MediatR;
@@ -85,7 +86,7 @@ namespace WebApi.Controllers
             var query = request.ToCommand(id);
             await _mediator.Send(query, token);
 
-            return Ok("Adres Başarıyla Güncellendi.");
+            return Ok(AddressConstants.AddressUpdateSuccess);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -98,7 +99,7 @@ namespace WebApi.Controllers
 
             await _redisClient.Delete(cacheKey);
 
-            return Ok("Adres Başarıyla Silindi.");
+            return Ok(AddressConstants.AddressDeleteSuccess);
         }
     }
 }
