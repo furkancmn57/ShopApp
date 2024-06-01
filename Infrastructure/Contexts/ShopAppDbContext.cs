@@ -14,13 +14,6 @@ namespace Infrastructure.Contexts
 {
     public class ShopAppDbContext : DbContext, IShopAppDbContext
     {
-        private readonly IConfiguration _configuration;
-
-        public ShopAppDbContext(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
         public DbSet<ProductAggregate> Products { get; set; }
         public DbSet<OrderAggregate> Orders { get; set; }
         public DbSet<UserAggregate> Users { get; set; }
@@ -28,7 +21,7 @@ namespace Infrastructure.Contexts
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var builder = new NpgsqlDataSourceBuilder(_configuration.GetConnectionString("DefaultConnection"));
+            var builder = new NpgsqlDataSourceBuilder("Server=localhost;Port=5432;Database=ShopAppDb;Userid=postgres;Password=123456;Include Error Detail=True;");
             builder.EnableDynamicJson();
             var dataSource = builder.Build();
             optionsBuilder.UseNpgsql(dataSource);

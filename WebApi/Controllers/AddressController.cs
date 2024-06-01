@@ -68,15 +68,7 @@ namespace WebApi.Controllers
             var query = new GetAddressByIdQuery(id);
             var result = await _mediator.Send(query, token);
 
-            var response = new GetAddressResponse
-            {
-                Id = result.Id,
-                AddressTitle = result.AddressTitle,
-                Address = result.Address,
-                CreatedDate = result.CreatedDate
-            };
-
-            return Ok(response);
+            return Ok(result);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]

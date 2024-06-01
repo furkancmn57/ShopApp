@@ -1,8 +1,10 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository;
 using Application.Features.Address.Commands;
 using Application.Features.Address.Constans;
 using Application.Features.Address.Validatators;
+using Application.Features.User.Constants;
 using Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Application.Features.Address.Commands
 {
-    public class CreateAddressCommand : IRequest<AddressAggregate>
+    public class CreateAddressCommand : IRequest
     {
         public CreateAddressCommand(int userId, string addressTitle, string address)
         {
@@ -27,22 +29,24 @@ namespace Application.Features.Address.Commands
         public string AddressTitle { get; set; }
         public string Address { get; set; }
 
-        public class Handler : IRequestHandler<CreateAddressCommand, AddressAggregate>
+        public class Handler : IRequestHandler<CreateAddressCommand>
         {
-            private readonly IShopAppDbContext _context;
+            private readonly IAddressRepository _addressRepository;
+            private readonly IUserRepository _userRepository;
 
-            public Handler(IShopAppDbContext context)
+            public Handler(IUserRepository userRepository, IAddressRepository addressRepository)
             {
-                _context = context;
+                _userRepository = userRepository;
+                _addressRepository = addressRepository;
             }
 
-            public async Task<AddressAggregate> Handle(CreateAddressCommand request, CancellationToken cancellationToken)
+            public async Task Handle(CreateAddressCommand request, CancellationToken cancellationToken)
             {
-                var user =  await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId);
+                var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
 
-                if (user is null)
+                if (user.Addresses.Count <= 3)
                 {
-                    throw new NotFoundExcepiton("User Bulunamadı.");
+                    throw new BusinessException(AddressConstants.AddressLimitError);
                 }
 
                 var validator = new CreateAddressCommandValidator();
@@ -53,12 +57,15 @@ namespace Application.Features.Address.Commands
                     throw new ValidationException(AddressConstants.AddressAddError, validationResult.ToDictionary());
                 }
 
-                var address = AddressAggregate.Create(request.AddressTitle, request.Address, user);
+                var address = new AddressAggregate
+                {
+                    AddressTitle = request.AddressTitle,
+                    Address = request.Address,
+                    User = user
+                };
 
-                await _context.Addresses.AddAsync(address, cancellationToken);
-                await _context.SaveChangesAsync(cancellationToken);
 
-                return address;
+                await _addressRepository.AddAsync(address,cancellationToken);
             }
         }
     }

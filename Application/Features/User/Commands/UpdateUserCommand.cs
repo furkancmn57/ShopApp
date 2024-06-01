@@ -1,5 +1,6 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository;
 using Application.Features.User.Constants;
 using Domain.Models;
 using MediatR;
@@ -29,25 +30,21 @@ namespace Application.Features.User.Commands
 
         public class Handler : IRequestHandler<UpdateUserCommand>
         {
-            private readonly IShopAppDbContext _context;
-
-            public Handler(IShopAppDbContext context)
+            private readonly IUserRepository _userRepository;
+            public Handler(IUserRepository userRepository)
             {
-                _context = context;
+                _userRepository = userRepository;
             }
 
             public async Task Handle(UpdateUserCommand request, CancellationToken cancellationToken)
             {
-                var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+                var user = await _userRepository.GetByIdAsync(request.Id, cancellationToken);
 
-                if (user is null)
-                {
-                    throw new NotFoundExcepiton(UserConstants.UserNotFound);
-                }
+                user.FirstName = request.FirstName;
+                user.LastName = request.LastName;
+                user.Email = request.Email;
 
-                user.Update(request.FirstName, request.LastName, request.Email);
-
-                await _context.SaveChangesAsync(cancellationToken);
+                await _userRepository.UpdateAsync(user, cancellationToken);
             }
         }
     }

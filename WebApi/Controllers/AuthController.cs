@@ -16,9 +16,10 @@ namespace WebApi.Controllers
         private readonly IMediator _mediator;
         private readonly IRedisDbContext _redisClient;
 
-        public AuthController(IMediator mediator)
+        public AuthController(IMediator mediator, IRedisDbContext redisClient = null)
         {
             _mediator = mediator;
+            _redisClient = redisClient;
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]

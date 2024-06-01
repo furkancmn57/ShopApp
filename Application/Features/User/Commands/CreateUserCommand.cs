@@ -1,5 +1,6 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository;
 using Application.Common.Tools;
 using Application.Features.User.Constants;
 using Application.Features.User.Validators;
@@ -33,17 +34,17 @@ namespace Application.Features.User.Commands
 
         public class Handler : IRequestHandler<CreateUserCommand, AccessToken>
         {
-            private readonly IShopAppDbContext _context;
+            private readonly IUserRepository _userRepository;
             private readonly IAuthService _authService;
             private readonly IPasswordService _passwordService;
             private readonly IRedisDbContext _redisClient;
 
-            public Handler(IShopAppDbContext context, IAuthService authService, IPasswordService passwordService, IRedisDbContext redisClient)
+            public Handler(IUserRepository userRepository, IAuthService authService, IPasswordService passwordService, IRedisDbContext redisClient)
             {
-                _context = context;
+                _userRepository = userRepository;
                 _authService = authService;
                 _passwordService = passwordService;
-               _redisClient = redisClient;
+                _redisClient = redisClient;
             }
 
             public async Task<AccessToken> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -56,7 +57,7 @@ namespace Application.Features.User.Commands
                     throw new ValidationException(UserConstants.UserCreateError, validationResult.ToDictionary());
                 }
 
-                var userExist = await _context.Users.AnyAsync(x => x.Email == request.Email,cancellationToken);
+                var userExist = await _userRepository.UserExist(request.Email,cancellationToken);
 
                 if (userExist)
                 {
@@ -68,8 +69,7 @@ namespace Application.Features.User.Commands
 
                 var user = UserAggregate.Create(request.FirstName, request.LastName, request.Email, hashPassword);
 
-                await _context.Users.AddAsync(user, cancellationToken);
-                await _context.SaveChangesAsync(cancellationToken);
+                await _userRepository.AddAsync(user, cancellationToken);
 
                 var accessToken = await _authService.CreateAccessToken(user);
 

@@ -1,10 +1,13 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository;
 using Application.Common.Tools;
 using Application.Features.Address.Constans;
 using Application.Features.Order.Commands;
 using Application.Features.Order.Constants;
 using Application.Features.Order.Validators;
+using Application.Features.Product.Constans;
+using Application.Features.User.Constants;
 using Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -33,51 +36,60 @@ namespace Application.Features.Order.Commands
         
         public class Handler : IRequestHandler<CreateOrderCommand>
         {
-            private readonly IShopAppDbContext _context;
+            private readonly IOrderRepository _orderRepository;
+            private readonly IAddressRepository _addressRepository;
+            private readonly IUserRepository _userRepository;
+            private readonly IProductRepository _productRepository;
 
-            public Handler(IShopAppDbContext context)
+            public Handler(IOrderRepository orderRepository, IAddressRepository addressRepository, IProductRepository productRepository, IUserRepository userRepository)
             {
-                _context = context;
+                _orderRepository = orderRepository;
+                _addressRepository = addressRepository;
+                _productRepository = productRepository;
+                _userRepository = userRepository;
             }
 
             public async Task Handle(CreateOrderCommand request, CancellationToken cancellationToken)
             {
-                var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId);
+                var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
 
-                if (user is null)
+                var address = await _addressRepository.GetByIdAsync(request.AddressId, cancellationToken);
+
+                var products = new List<ProductAggregate>();
+                for (int i = 0; i < request.ProductIds.Count; i++)
                 {
-                    throw new NotFoundExcepiton("Kulanıcı Bulunamadı.");
+                    var product = await _productRepository.GetByIdAsync(request.ProductIds[i], cancellationToken);
+                    if (product is null)
+                    {
+                        throw new NotFoundExcepiton(ProductConstants.ProductNotFound);
+                    }
+                    products.Add(product);
                 }
-
-                var address = await _context.Addresses.FirstOrDefaultAsync(x => x.Id == request.AddressId);
-
-                if (address is null)
-                {
-                    throw new NotFoundExcepiton("Adres Bulunamadı.");
-                }
-
-                var products = await _context.Products.Where(x => request.ProductIds.Contains(x.Id)).ToListAsync(cancellationToken);
 
                 if (products.Count != request.ProductIds.Count)
                 {
-                    throw new NotFoundExcepiton("Ürünler Bulunamadı.");
+                    throw new NotFoundExcepiton(ProductConstants.ProductNotFound);
                 }
+                
+                products.ForEach(x => x.Quantity--);
+
+                if (products.Any(x => x.Quantity < 0))
+                {
+                    throw new BusinessException(ProductConstants.ProductQuantityGreaterThanZero);
+                }
+
+                double totalAmount = products.Sum(x => x.Price);
 
                 var validator = new CreateOrderCommandValidator();
                 var validationResult = validator.Validate(request);
 
-                if (validationResult.IsValid == false)
+                if (validationResult.IsValid is false)
                 {
                     throw new ValidationException(OrderConstants.OrderAddError, validationResult.ToDictionary());
                 }
 
-                products.ForEach(x => x.Quantity--);
-                double totalAmount = products.Sum(x => x.Price);
-
-                var order = OrderAggregate.Create(totalAmount, 5, request.CustomerName, products, address, user);
-
-                await _context.Orders.AddAsync(order, cancellationToken);
-                await _context.SaveChangesAsync(cancellationToken);
+                var order = OrderAggregate.Create(totalAmount, 0, request.CustomerName, products, address, user);
+                await _orderRepository.CreateAsync(order, cancellationToken);
             }
         }
     }

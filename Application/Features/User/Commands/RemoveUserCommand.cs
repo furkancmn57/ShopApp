@@ -1,7 +1,9 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository;
 using Application.Features.User.Constants;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,24 +23,18 @@ namespace Application.Features.User.Commands
 
         public class Handler : IRequestHandler<RemoveUserCommand>
         {
-            private readonly IShopAppDbContext _context;
+            private readonly IUserRepository _userRepository;
 
-            public Handler(IShopAppDbContext context)
+            public Handler(IUserRepository userRepository)
             {
-                _context = context;
+                _userRepository = userRepository;
             }
 
             public async Task Handle(RemoveUserCommand request, CancellationToken cancellationToken)
             {
-                var user = await _context.Users.FindAsync(request.Id);
+                var user = await _userRepository.GetByIdAsync(request.Id, cancellationToken);
 
-                if (user is null)
-                {
-                    throw new NotFoundExcepiton(UserConstants.UserNotFound);
-                }
-
-                _context.Users.Remove(user);
-                await _context.SaveChangesAsync(cancellationToken);
+                await _userRepository.DeleteAsync(user, cancellationToken);
             }
         }
     }

@@ -1,8 +1,11 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository;
+using Application.Features.Address.Constans;
 using Application.Features.Address.Models;
 using Domain.Models;
 using MediatR;
+using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -23,30 +26,26 @@ namespace Application.Features.Address.Queries
 
         public class Handler : IRequestHandler<GetAddressByIdQuery, GetAddressResponse>
         {
-            private readonly IShopAppDbContext _context;
+            private readonly IAddressRepository _addressRepository;
 
-            public Handler(IShopAppDbContext context)
+            public Handler(IAddressRepository addressRepository)
             {
-                _context = context;
+                _addressRepository = addressRepository;
             }
 
             public async Task<GetAddressResponse> Handle(GetAddressByIdQuery request, CancellationToken cancellationToken)
             {
+                var address = await _addressRepository.GetByIdAsync(request.Id, cancellationToken);
 
-                var address = await _context.Addresses.Select(x => new GetAddressResponse
+                var response = new GetAddressResponse
                 {
-                    Id = x.Id,
-                    AddressTitle = x.AddressTitle,
-                    Address = x.Address,
-                    CreatedDate = x.CreatedDate
-                }).FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+                    Id = address.Id,
+                    Address = address.Address,
+                    AddressTitle = address.AddressTitle,
+                    CreatedDate = address.CreatedDate,
+                };
 
-                if (address is null)
-                {
-                    throw new NotFoundExcepiton("Adres Bulunamadı.");
-                }
-
-                return address;
+                return response;
             }
         }
     }

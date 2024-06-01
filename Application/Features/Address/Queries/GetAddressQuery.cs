@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository;
 using Application.Common.Pagination;
 using Application.Features.Address.Models;
 using Domain.Models;
@@ -18,37 +19,17 @@ namespace Application.Features.Address.Queries
         public int PageSize { get; set; }
         public class Handler : IRequestHandler<GetAddressQuery, Pagination<GetAddressResponse>>
         {
-            private readonly IShopAppDbContext _context;
-
-            public Handler(IShopAppDbContext context)
+            private readonly IAddressRepository _addressRepository;
+            public Handler(IAddressRepository addressRepository)
             {
-                _context = context;
+                _addressRepository = addressRepository;
             }
 
             public async Task<Pagination<GetAddressResponse>> Handle(GetAddressQuery request, CancellationToken cancellationToken)
             {
-                var totaladdresses = await _context.Addresses.CountAsync(cancellationToken);
+                var addresses = await _addressRepository.GetAsync(request.Page, request.PageSize, cancellationToken);
 
-                var addresses = await _context.Addresses
-                    .Select(x => new GetAddressResponse
-                    {
-                        Id = x.Id,
-                        AddressTitle = x.AddressTitle,
-                        Address = x.Address,
-                        CreatedDate = x.CreatedDate
-                    })
-                    .Skip((request.Page - 1) * request.PageSize)
-                    .Take(request.PageSize)
-                    .ToListAsync(cancellationToken);
-
-                return new Pagination<GetAddressResponse>
-                {
-                    Page = request.Page,
-                    PageSize = request.PageSize,
-                    TotalCount = totaladdresses,
-                    TotalPages = (int)Math.Ceiling(totaladdresses / (decimal)request.PageSize),
-                    Data = addresses
-                };
+                return addresses;
             }
         }
     }

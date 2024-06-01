@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Application.Features.Order.Constants;
 using Application.Features.Order.Models;
 using Application.Features.Order.Queries;
 using MediatR;
@@ -71,7 +72,7 @@ namespace WebApi.Controllers
 
             var command = request.ToCommand();
             await _mediator.Send(command,token);
-            return Ok("Sipariş başarıyla oluşturuldu.");
+            return Ok(OrderConstants.OrderAddSuccess);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -82,7 +83,7 @@ namespace WebApi.Controllers
 
             await _mediator.Send(command,token);
 
-            return Ok("Sipariş başarıyla güncellendi.");
+            return Ok(OrderConstants.OrderUpdate);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -92,11 +93,10 @@ namespace WebApi.Controllers
             string cacheKey = $"order_{id}";
 
             var command = request.ToCommand(id);
-
             await _mediator.Send(command,token);
             await _redisClient.Delete(cacheKey);
 
-            return Ok("Sipariş başarıyla silindi.");
+            return Ok(OrderConstants.OrderDeleteSuccess);
         }
     }
 }

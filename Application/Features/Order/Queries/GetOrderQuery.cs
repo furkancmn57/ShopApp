@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository;
 using Application.Common.Pagination;
 using Application.Features.Order.Models;
 using Domain.Models;
@@ -18,41 +19,18 @@ namespace Application.Features.Order.Queries
         public int PageSize { get; set; }
         public class Handler : IRequestHandler<GetOrderQuery, Pagination<GetOrdersResponse>>
         {
-            private readonly IShopAppDbContext _context;
+            private readonly IOrderRepository _orderRepository;
 
-            public Handler(IShopAppDbContext context)
+            public Handler(IOrderRepository orderRepository)
             {
-                _context = context;
+                _orderRepository = orderRepository;
             }
 
             public async Task<Pagination<GetOrdersResponse>> Handle(GetOrderQuery request, CancellationToken cancellationToken)
             {
-                var totalorders = await _context.Orders.CountAsync(cancellationToken);
+                var orders = await _orderRepository.GetAsync(request.Page, request.PageSize, cancellationToken);
 
-                var orders = await _context.Orders
-                    .Select(x => new GetOrdersResponse
-                    {
-                        Id = x.Id,
-                        OrderNumber = x.OrderNumber,
-                        CustomerName = x.CustomerName,
-                        DiscountAmount = x.DiscountAmount,
-                        TotalAmount = x.TotalAmount,
-                        Status = x.Status.ToString(),
-                        CreatedDate = x.CreatedDate,
-
-                    })
-                    .Skip((request.Page - 1) * request.PageSize)
-                    .Take(request.PageSize)
-                    .ToListAsync(cancellationToken);
-
-                return new Pagination<GetOrdersResponse>
-                {
-                    Page = request.Page,
-                    PageSize = request.PageSize,
-                    TotalCount = totalorders,
-                    TotalPages = (int)Math.Ceiling(totalorders / (decimal)request.PageSize),
-                    Data = orders
-                };
+                return orders;
             }
         }
     }

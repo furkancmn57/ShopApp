@@ -36,6 +36,7 @@ namespace Domain.Models
         {
             AddressTitle = addressTitle;
             Address = address;
+            UpdatedDate = DateTime.Now;
             return this;
         }
     }

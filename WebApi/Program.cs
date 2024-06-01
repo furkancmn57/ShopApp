@@ -1,8 +1,10 @@
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository;
 using Application.Services;
 using Application.Services.AuthService;
 using Application.Services.PasswordService;
 using Infrastructure.Contexts;
+using Infrastructure.Persistence.Repositories;
 using Infrastructure.Persistence.Repositories.MailProviders;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -14,9 +16,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<IShopAppDbContext, ShopAppDbContext>();
-builder.Services.AddScoped<IAuthService, AuthManager>();
-builder.Services.AddScoped<IPasswordService, PasswordManager>();
 builder.Services.AddApplicationService(builder.Configuration);
+builder.Services.AddScoped<IAuthService, AuthManager>();
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IPasswordService, PasswordManager>();
+
+
 builder.Services.AddSingleton<IRedisDbContext, RedisDbContext>();
 builder.Services.AddSingleton<IMailProviderFactory, MailProviderFactory>();
 

@@ -68,27 +68,16 @@ namespace WebApi.Controllers
             var query = new GetProductByIdQuery(id);
             var result = await _mediator.Send(query, token);
 
-            var response = new GetProductResponse
-            {
-                Id = result.Id,
-                Name = result.Name,
-                Description = result.Description,
-                Price = result.Price,
-                Ingredients = result.Ingredients,
-                Quantity = result.Quantity,
-                CreatedDate = result.CreatedDate
-            };
+            await _redisClient.Add(cacheKey, result);
 
-            await _redisClient.Add(cacheKey, response);
-
-            return Ok(response);
+            return Ok(result);
         }
 
         [ProducesResponseType(StatusCodes.Status201Created)]
         [HttpPost]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProductRequest request)
         {
-            var result = await _mediator.Send(request.ToCommand());
+            await _mediator.Send(request.ToCommand());
 
             return Ok(ProductConstants.ProductCreateSuccess);
         }
@@ -109,10 +98,15 @@ namespace WebApi.Controllers
         {
             var cacheKey = $"product_{id}";
 
+            var cacheValue = await _redisClient.KeyExist(cacheKey);
+
+            if (cacheValue)
+            {
+                await _redisClient.Delete(cacheKey);
+            }
+
             var query = request.ToCommand(id);
             await _mediator.Send(query, token);
-
-            await _redisClient.Delete(cacheKey);
 
             return Ok(ProductConstants.ProductDeleteSuccess);
         }

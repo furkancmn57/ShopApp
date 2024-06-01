@@ -38,7 +38,13 @@ namespace Domain.Models
             FirstName = firstName;
             LastName = lastName;
             Email = email;
+            UpdatedDate = DateTime.Now;
             return this;
+        }
+
+        public static implicit operator UserAggregate(AddressAggregate v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

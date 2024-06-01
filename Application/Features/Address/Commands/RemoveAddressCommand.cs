@@ -1,7 +1,9 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository;
 using Application.Features.Address.Constans;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,23 +24,19 @@ namespace Application.Features.Address.Commands
         public class Handler : IRequestHandler<RemoveAddressCommand>
         {
             private readonly IShopAppDbContext _context;
+            private readonly IAddressRepository _addressRepository;
 
-            public Handler(IShopAppDbContext context)
+            public Handler(IShopAppDbContext context, IAddressRepository addressRepository)
             {
                 _context = context;
+                _addressRepository = addressRepository;
             }
 
             public async Task Handle(RemoveAddressCommand request, CancellationToken cancellationToken)
             {
-                var address = await _context.Addresses.FindAsync(request.Id);
+                var address = await _addressRepository.GetByIdAsync(request.Id, cancellationToken);
 
-                if (address is null)
-                {
-                    throw new NotFoundExcepiton(AddressConstants.AddressNotFound);
-                }
-
-                _context.Addresses.Remove(address);
-                await _context.SaveChangesAsync(cancellationToken);
+                await _addressRepository.DeleteAsync(address,cancellationToken);
             }
         }
     }

@@ -1,7 +1,9 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository;
 using Application.Features.Order.Constants;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,24 +23,18 @@ namespace Application.Features.Order.Commands
 
         public class Handler : IRequestHandler<RemoveOrderCommand>
         {
-            private readonly IShopAppDbContext _context;
+            private readonly IOrderRepository _orderRepository;
 
-            public Handler(IShopAppDbContext context)
+            public Handler(IOrderRepository orderRepository)
             {
-                _context = context;
+                _orderRepository = orderRepository;
             }
 
             public async Task Handle(RemoveOrderCommand request, CancellationToken cancellationToken)
             {
-                var order = await _context.Orders.FindAsync(request.Id);
+                var order = await _orderRepository.GetByIdAsync(request.Id, cancellationToken);
 
-                if (order is null)
-                {
-                    throw new NotFoundExcepiton(OrderConstants.OrderNotFound);
-                }
-
-                _context.Orders.Remove(order);
-                await _context.SaveChangesAsync(cancellationToken);
+                await _orderRepository.DeleteAsync(order, cancellationToken);
             }
         }
     }

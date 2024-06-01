@@ -1,8 +1,10 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository;
 using Application.Features.Product.Constans;
 using Domain.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,25 +33,18 @@ namespace Application.Features.Product.Commands
 
         public class Handler : IRequestHandler<UpdateProductCommand>
         {
-            private readonly IShopAppDbContext _context;
+            private readonly IProductRepository _productRepository;
 
-            public Handler(IShopAppDbContext context)
+            public Handler(IProductRepository productRepository)
             {
-                _context = context;
+                _productRepository = productRepository;
             }
 
             public async Task Handle(UpdateProductCommand request, CancellationToken cancellationToken)
             {
-                var product = await _context.Products.FindAsync(request.Id);
+                var product = await _productRepository.GetByIdAsync(request.Id, cancellationToken);
 
-                if (product is null)
-                {
-                    throw new NotFoundExcepiton(ProductConstants.ProductNotFound);
-                }
-
-                product.Update(request.Name, request.Description, request.Price, request.Ingredients, request.Quantity);
-
-                await _context.SaveChangesAsync(cancellationToken);
+                await _productRepository.UpdateAsync(product, cancellationToken);
             }
         }
     }

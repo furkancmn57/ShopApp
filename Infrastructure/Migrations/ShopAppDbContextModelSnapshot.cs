@@ -47,6 +47,18 @@ namespace Infrastructure.Migrations
                         .HasColumnType("date")
                         .HasColumnName("created_date");
 
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("date")
+                        .HasColumnName("deleted_date");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("boolean");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("date")
+                        .HasColumnName("updated_date");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -69,31 +81,42 @@ namespace Infrastructure.Migrations
                     b.Property<int>("AddressId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("date")
+                        .HasColumnName("created_date");
+
                     b.Property<string>("CustomerName")
                         .IsRequired()
                         .HasColumnType("varchar(250)")
                         .HasColumnName("customer_name");
 
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("date")
+                        .HasColumnName("deleted_date");
+
                     b.Property<double>("DiscountAmount")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("discount_amount");
 
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("date")
-                        .HasColumnName("order_date");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("boolean");
 
                     b.Property<Guid>("OrderNumber")
                         .HasColumnType("uuid")
                         .HasColumnName("order_number");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
+                    b.Property<int>("Status")
+                        .HasColumnType("int")
                         .HasColumnName("status");
 
                     b.Property<double>("TotalAmount")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("total_amount");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("date")
+                        .HasColumnName("updated_date");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -120,14 +143,23 @@ namespace Infrastructure.Migrations
                         .HasColumnType("date")
                         .HasColumnName("created_date");
 
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("date")
+                        .HasColumnName("deleted_date");
+
                     b.Property<string>("Description")
-                        .HasColumnType("text")
+                        .IsRequired()
+                        .HasColumnType("varchar(250)")
                         .HasColumnName("description");
 
                     b.Property<List<Ingredients>>("Ingredients")
                         .IsRequired()
                         .HasColumnType("jsonb")
                         .HasColumnName("ingredients");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -143,6 +175,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("double precision")
                         .HasDefaultValue(0.0)
                         .HasColumnName("quantity");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("date")
+                        .HasColumnName("updated_date");
 
                     b.HasKey("Id");
 
@@ -162,6 +198,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("date")
                         .HasColumnName("created_date");
 
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("date")
+                        .HasColumnName("deleted_date");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("varchar(50)")
@@ -172,6 +212,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("varchar(30)")
                         .HasColumnName("first_name");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("varchar(30)")
@@ -181,6 +225,10 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(250)")
                         .HasColumnName("password");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("date")
+                        .HasColumnName("updated_date");
 
                     b.HasKey("Id");
 

@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository;
 using Application.Common.Pagination;
 using Application.Features.Product.Models;
 using Domain.Models;
@@ -18,40 +19,18 @@ namespace Application.Features.Product.Queries
         public int PageSize { get; set; }
         public class Handler : IRequestHandler<GetProductQuery, Pagination<GetProductResponse>>
         {
-            private readonly IShopAppDbContext _context;
+            private readonly IProductRepository _productRepository;
 
-            public Handler(IShopAppDbContext context)
+            public Handler(IProductRepository productRepository)
             {
-                _context = context;
+                _productRepository = productRepository;
             }
 
             public async Task<Pagination<GetProductResponse>> Handle(GetProductQuery request, CancellationToken cancellationToken)
             {
-                var totalproducts = await _context.Products.CountAsync(cancellationToken);
+               var products = await _productRepository.GetAsync(request.Page, request.PageSize, cancellationToken);
 
-                var products = await _context.Products
-                    .Select(x => new GetProductResponse
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Description = x.Description,
-                        Price = x.Price,
-                        Ingredients = x.Ingredients,
-                        CreatedDate = x.CreatedDate
-                    })
-                    .Skip((request.Page - 1) * request.PageSize)
-                    .Take(request.PageSize)
-                    .ToListAsync(cancellationToken);
-
-
-                return new Pagination<GetProductResponse>
-                {
-                    Page = request.Page,
-                    PageSize = request.PageSize,
-                    TotalCount = totalproducts,
-                    TotalPages = (int)Math.Ceiling(totalproducts / (decimal)request.PageSize),
-                    Data = products
-                };
+               return products;
             }
         }
     }

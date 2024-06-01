@@ -1,7 +1,11 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository;
+using Application.Features.Product.Constans;
+using Application.Features.Product.Models;
 using Domain.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Application.Features.Product.Queries
 {
-    public class GetProductByIdQuery : IRequest<ProductAggregate>
+    public class GetProductByIdQuery : IRequest<GetProductResponse>
     {
         public GetProductByIdQuery(int id)
         {
@@ -19,25 +23,31 @@ namespace Application.Features.Product.Queries
 
         public int Id { get; set; }
 
-        public class Handler : IRequestHandler<GetProductByIdQuery, ProductAggregate>
+        public class Handler : IRequestHandler<GetProductByIdQuery, GetProductResponse>
         {
-            private readonly IShopAppDbContext _context;
+            private readonly IProductRepository _productRepository;
 
-            public Handler(IShopAppDbContext context)
+            public Handler(IProductRepository productRepository)
             {
-                _context = context;
+                _productRepository = productRepository;
             }
 
-            public async Task<ProductAggregate> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
+            public async Task<GetProductResponse> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
             {
-                var product = await _context.Products.FindAsync(request.Id);
+                var product = await _productRepository.GetByIdAsync(request.Id, cancellationToken);
 
-                if (product is null)
+                var response = new GetProductResponse
                 {
-                    throw new NotFoundExcepiton("Ürün Bulunamadı");
-                }
+                    Id = product.Id,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price,
+                    Ingredients = product.Ingredients,
+                    Quantity = product.Quantity,
+                    CreatedDate = product.CreatedDate,
+                };
 
-                return product;
+                return response;
             }
         }
     }

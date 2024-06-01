@@ -1,5 +1,6 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository;
 using Application.Features.Product.Constans;
 using Application.Features.Product.Validators;
 using Domain.Models;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Application.Features.Product.Commands
 {
-    public class CreateProductCommand : IRequest<ProductAggregate>
+    public class CreateProductCommand : IRequest
     {
         public CreateProductCommand(string name, string description, double price, List<Ingredients> ingredients, double quantity)
         {
@@ -29,16 +30,16 @@ namespace Application.Features.Product.Commands
         public List<Ingredients> Ingredients { get; set; }
         public double Quantity { get; set; }
 
-        public class Handler : IRequestHandler<CreateProductCommand, ProductAggregate>
+        public class Handler : IRequestHandler<CreateProductCommand>
         {
-            private readonly IShopAppDbContext _context;
+            private readonly IProductRepository _productRepository;
 
-            public Handler(IShopAppDbContext context)
+            public Handler(IProductRepository productRepository)
             {
-                _context = context;
+                _productRepository = productRepository;
             }
 
-            public async Task<ProductAggregate> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+            public async Task Handle(CreateProductCommand request, CancellationToken cancellationToken)
             {
                 var validator = new CreateProductCommandValidator();
                 var validationResult = validator.Validate(request);
@@ -50,10 +51,7 @@ namespace Application.Features.Product.Commands
 
                 var product = ProductAggregate.Create(request.Name, request.Description, request.Price, request.Ingredients, request.Quantity);
 
-                await _context.Products.AddAsync(product,cancellationToken);
-                await _context.SaveChangesAsync(cancellationToken);
-
-                return product;
+                await _productRepository.AddAsync(product, cancellationToken);
             }
         }
     }

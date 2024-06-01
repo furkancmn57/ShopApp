@@ -69,25 +69,9 @@ namespace WebApi.Controllers
             var query = new GetUserByIdQuery(id);
             var result = await _mediator.Send(query, token);
 
-            var response = new GetUserResponse
-            {
-                Id = result.Id,
-                FirstName = result.FirstName,
-                LastName = result.LastName,
-                Email = result.Email,
-                CreatedDate = result.CreatedDate,
-                Addresses = result.Addresses.Select(a => new GetAddressResponse
-                {
-                    Id = a.Id,
-                    AddressTitle = a.AddressTitle,
-                    Address = a.Address,
-                    CreatedDate = a.CreatedDate
-                }).ToList()
-            };
+            await _redisClient.Add(cacheKey, result);
 
-            await _redisClient.Add(cacheKey, response);
-
-            return Ok(response);
+            return Ok(result);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]

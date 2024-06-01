@@ -1,6 +1,9 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository;
+using Application.Features.Order.Constants;
 using Application.Features.Order.Models;
+using Application.Features.Product.Constans;
 using Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -23,54 +26,48 @@ namespace Application.Features.Order.Queries
 
         public class Handler : IRequestHandler<GetOrderByIdQuery, GetOrderByIdResponse>
         {
-            private readonly IShopAppDbContext _context;
 
-            public Handler(IShopAppDbContext context)
+            private readonly IOrderRepository _orderRepository;
+
+            public Handler(IOrderRepository orderRepository)
             {
-                _context = context;
+                _orderRepository = orderRepository;
             }
 
             public async Task<GetOrderByIdResponse> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken)
             {
-                var order = await _context.Orders
-                    .Include(i => i.Products)
-                    .Include(i => i.Address)
-                    .Include(i => i.User)
-                    .Where(x => x.Id == request.Id)
-                    .Select(order => new GetOrderByIdResponse
-                    {
-                        Id = order.Id,
-                        OrderNumber = order.OrderNumber,
-                        CustomerName = order.CustomerName,
-                        DiscountAmount = order.DiscountAmount,
-                        TotalAmount = order.TotalAmount,
-                        Status = order.Status.ToString(),
-                        Products = order.Products.Select(p => new GetProductResponseWithOrder
-                        {
-                            Id = p.Id,
-                            Name = p.Name,
-                            Description = p.Description,
-                            Price = p.Price
-                        }).ToList(),
-                        Address = new GetAddressResponseWithOrder
-                        {
-                            Address = order.Address.Address
-                        },
-                        User = new GetUserResponseWithOrder
-                        {
-                            FirstName = order.User.FirstName,
-                            LastName = order.User.LastName,
-                            Email = order.User.Email
-                        },
-                        CreatedDate = order.CreatedDate,
-                    }).FirstOrDefaultAsync(cancellationToken);
+                var order = await _orderRepository.GetByIdAsync(request.Id, cancellationToken);
 
-                if (order is null)
+                var response = new GetOrderByIdResponse
                 {
-                    throw new NotFoundExcepiton("Sipariş Bulunamadı.");
-                }
+                    Id = order.Id,
+                    OrderNumber = order.OrderNumber,
+                    CustomerName = order.CustomerName,
+                    DiscountAmount = order.DiscountAmount,
+                    TotalAmount = order.TotalAmount,
+                    Status = order.Status.ToString(),
+                    Products = order.Products.Select(p => new GetProductResponseWithOrder
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        Description = p.Description,
+                        Price = p.Price
+                    }).ToList(),
+                    Address = new GetAddressResponseWithOrder
+                    {
+                        Address = order.Address.Address
+                    },
+                    User = new GetUserResponseWithOrder
+                    {
+                        FirstName = order.User.FirstName,
+                        LastName = order.User.LastName,
+                        Email = order.User.Email
+                    },
+                    CreatedDate = order.CreatedDate,
+                };
 
-                return order;
+
+                return response;
             }
         }
     }  

@@ -21,11 +21,14 @@ namespace Infrastructure.Migrations
                     @int = table.Column<int>(name: "int", type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     product_name = table.Column<string>(type: "varchar(250)", nullable: false),
-                    description = table.Column<string>(type: "text", nullable: true),
+                    description = table.Column<string>(type: "varchar(250)", nullable: false),
                     price = table.Column<double>(type: "numeric(18,2)", nullable: false),
-                    created_date = table.Column<DateTime>(type: "date", nullable: false),
                     ingredients = table.Column<List<Ingredients>>(type: "jsonb", nullable: false),
-                    quantity = table.Column<double>(type: "double precision", nullable: false, defaultValue: 0.0)
+                    quantity = table.Column<double>(type: "double precision", nullable: false, defaultValue: 0.0),
+                    boolean = table.Column<bool>(type: "boolean", nullable: false),
+                    created_date = table.Column<DateTime>(type: "date", nullable: false),
+                    updated_date = table.Column<DateTime>(type: "date", nullable: false),
+                    deleted_date = table.Column<DateTime>(type: "date", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -42,7 +45,10 @@ namespace Infrastructure.Migrations
                     last_name = table.Column<string>(type: "varchar(30)", nullable: false),
                     email = table.Column<string>(type: "varchar(50)", nullable: false),
                     password = table.Column<string>(type: "varchar(250)", nullable: false),
-                    created_date = table.Column<DateTime>(type: "date", nullable: false)
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    created_date = table.Column<DateTime>(type: "date", nullable: false),
+                    updated_date = table.Column<DateTime>(type: "date", nullable: false),
+                    deleted_date = table.Column<DateTime>(type: "date", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -58,7 +64,10 @@ namespace Infrastructure.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     address_title = table.Column<string>(type: "varchar(50)", nullable: false),
                     address = table.Column<string>(type: "varchar(250)", nullable: false),
-                    created_date = table.Column<DateTime>(type: "date", nullable: false)
+                    boolean = table.Column<bool>(type: "boolean", nullable: false),
+                    created_date = table.Column<DateTime>(type: "date", nullable: false),
+                    updated_date = table.Column<DateTime>(type: "date", nullable: false),
+                    deleted_date = table.Column<DateTime>(type: "date", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -83,8 +92,11 @@ namespace Infrastructure.Migrations
                     total_amount = table.Column<double>(type: "numeric(18,2)", nullable: false),
                     discount_amount = table.Column<double>(type: "numeric(18,2)", nullable: false),
                     customer_name = table.Column<string>(type: "varchar(250)", nullable: false),
-                    status = table.Column<string>(type: "varchar(50)", nullable: false),
-                    order_date = table.Column<DateTime>(type: "date", nullable: false)
+                    status = table.Column<int>(type: "int", nullable: false),
+                    boolean = table.Column<bool>(type: "boolean", nullable: false),
+                    created_date = table.Column<DateTime>(type: "date", nullable: false),
+                    updated_date = table.Column<DateTime>(type: "date", nullable: false),
+                    deleted_date = table.Column<DateTime>(type: "date", nullable: true)
                 },
                 constraints: table =>
                 {

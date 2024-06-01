@@ -15,6 +15,7 @@ namespace Application.Features.Address.Constans
         public const string AddressTitleMaxLength = "Adres Başlığı maksimum 50 karakter olabilir.";
         public const string AddressMinLength = "Adres minimum 10 karakter olabilir.";
         public const string AddressMaxLength = "Adres maksimum 100 karakter olabilir.";
+        public const string AddressLimitError = "Kullanıcı en fazla 3 adet adres ekleyebilir.";
 
         // NotFound
         public const string AddressNotFound = "Adres Bulunamadı.";
