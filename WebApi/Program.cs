@@ -1,14 +1,16 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repository;
+using Application.Features.Order.Commands;
 using Application.Services;
 using Application.Services.AuthService;
 using Application.Services.PasswordService;
 using Infrastructure.Contexts;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Persistence.Repositories.MailProviders;
+using Infrastructure.RabbitMq.Consumers;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using NetTopologySuite.Index.HPRtree;
 using System.Text;
 using WebApi.Middlewares;
 
@@ -31,6 +33,7 @@ builder.Services.AddSingleton<IMailProviderFactory, MailProviderFactory>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -41,6 +44,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                context.NoResult();
+                context.Response.StatusCode = 401;
+                context.Response.ContentType = "text/plain";
+
+                return context.Response.WriteAsync("Unauthorized");
+            }
+        };
     });
 
 
@@ -48,6 +62,32 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 });
+
+builder.Services.AddMassTransit(bus =>
+{
+    bus.AddConsumer<UpdateOrderConsumer>();
+
+    bus.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("localhost", "/", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+
+        cfg.ReceiveEndpoint("shopapp.updateorder.sendmail", e =>
+        {
+            e.Consumer<UpdateOrderConsumer>(context);
+
+            e.Bind("updateorder", x =>
+            {
+                x.ExchangeType = "fanout";
+            });
+        });
+
+    });
+});
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

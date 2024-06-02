@@ -5,6 +5,8 @@ using Application.Features.Mail.Enums;
 using Application.Features.Mail.Models;
 using Application.Features.Order.Constants;
 using Domain.Enums;
+using Domain.Models;
+using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -29,11 +31,12 @@ namespace Application.Features.Order.Commands
         public class Handler : IRequestHandler<UpdateOrderCommand>
         {
             private readonly IOrderRepository _orderRepository;
-            private readonly IMailProviderFactory _mailProviderFactory;
-            public Handler(IOrderRepository orderRepository, IMailProviderFactory mailProviderFactory)
+            private readonly IPublishEndpoint _publishEndpoint;
+
+            public Handler(IOrderRepository orderRepository, IPublishEndpoint publishEndpoint)
             {
                 _orderRepository = orderRepository;
-                _mailProviderFactory = mailProviderFactory;
+                _publishEndpoint = publishEndpoint;
             }
 
             public async Task Handle(UpdateOrderCommand request, CancellationToken cancellationToken)
@@ -44,8 +47,11 @@ namespace Application.Features.Order.Commands
 
                 await _orderRepository.UpdateAsync(order, cancellationToken);
 
-                var mailProvider = _mailProviderFactory.GetProvider(new Settings());
-                await mailProvider.Send($"Siparişinizin durumu güncellendi. Yeni durum: {request.Status}", "Sipariş Durumu Güncellendi", order.User.Email.ToString());
+                await _publishEndpoint.Publish(new UpdateOrderMessage
+                {
+                    Email = order.User.Email,
+                    Status = order.Status.ToString()
+                }, cancellationToken);
             }
         }
     }

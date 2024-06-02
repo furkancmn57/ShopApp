@@ -13,7 +13,6 @@ namespace Infrastructure.Persistence.Configrations
     {
         public void Configure(EntityTypeBuilder<UserAggregate> builder)
         {
-
             builder.ToTable("user");
             builder.HasKey(x => x.Id);
 
@@ -29,6 +28,9 @@ namespace Infrastructure.Persistence.Configrations
 
             builder.HasMany(x => x.Addresses).WithOne(x => x.User);
             builder.HasMany(x => x.Orders).WithOne(x => x.User);
+
+            builder.HasIndex(x => x.Email).IsUnique();
+            builder.HasIndex(builder => new { builder.FirstName, builder.LastName });
         }
     }
 }

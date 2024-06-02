@@ -22,7 +22,7 @@ namespace Infrastructure.Persistence.Repositories.MailProviders.Providers
             _configuration = configuration;
         }
 
-        public async Task Send(string messageString, string titleString, string address)
+        public async Task Send(string messageString, string titleString, string address, CancellationToken token)
         {
             MailMessage message = new MailMessage();
 
@@ -42,7 +42,7 @@ namespace Infrastructure.Persistence.Repositories.MailProviders.Providers
             ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-            await client.SendMailAsync(message);
+            await client.SendMailAsync(message,token);
         }
     }
 }

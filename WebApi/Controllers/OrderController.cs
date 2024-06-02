@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Pagination;
 using Application.Features.Order.Constants;
 using Application.Features.Order.Models;
 using Application.Features.Order.Queries;
@@ -45,18 +46,22 @@ namespace WebApi.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
-        public async Task<IActionResult> GetOrders(CancellationToken token, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetOrders([FromQuery] int? page, [FromQuery] int? pageSize, CancellationToken token)
         {
+            page = page.HasValue ? page.Value : 1;
+            pageSize = pageSize.HasValue ? pageSize.Value : 10;
+
             string cacheKey = $"orders_{page}_{pageSize}";
 
-            var cacheValue = await _redisClient.Get<GetOrderByIdResponse>(cacheKey);
+            var cacheValue = await _redisClient.Get<Pagination<GetOrderByIdResponse>>(cacheKey);
 
             if (cacheValue is not null)
             {
                 return Ok(cacheValue);
             }
 
-            var query = new GetOrderQuery();
+
+            var query = new GetOrderQuery(page.Value,pageSize.Value);
             var orders = await _mediator.Send(query,token);
            
 

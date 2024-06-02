@@ -15,6 +15,12 @@ namespace Application.Features.Order.Queries
 {
     public class GetOrderQuery : IRequest<Pagination<GetOrdersResponse>>
     {
+        public GetOrderQuery(int page, int pageSize)
+        {
+            Page = page;
+            PageSize = pageSize;
+        }
+
         public int Page { get; set; }
         public int PageSize { get; set; }
         public class Handler : IRequestHandler<GetOrderQuery, Pagination<GetOrdersResponse>>

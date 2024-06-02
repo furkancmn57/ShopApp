@@ -44,7 +44,7 @@ namespace Application.Features.Address.Commands
             {
                 var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
 
-                if (user.Addresses.Count <= 3)
+                if (user.Addresses.Count >= 3)
                 {
                     throw new BusinessException(AddressConstants.AddressLimitError);
                 }
